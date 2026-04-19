@@ -19,9 +19,143 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import type { SceneProps } from "@/lib/i18n";
+import type { Dict, SceneProps } from "@/lib/i18n";
 
-export default function MedalBurkina(_props: SceneProps = {}) {
+type T = {
+  supra: string;
+  titleA: string;
+  titleB: string;
+  subArabic: string;
+  subtitle: string;
+  badge: string;
+  bodyP1: string;
+  orderParen: string;
+  bodyP2: string;
+  year2017: string;
+  bodyP3: string;
+  dateCeremony: string;
+  bodyP4: string;
+  traoreName: string;
+  bodyP5: string;
+  patriotism: string;
+  bodyP6: string;
+  fact1Pre: string;
+  fact1Highlight: string;
+  fact1Post: string;
+  fact2Pre: string;
+  fact2Cement: string;
+  fact2Mid: string;
+  fact2Molds: string;
+  fact2Post: string;
+  fact2Initiative: string;
+  fact2End: string;
+  fact3Pre: string;
+  fact3Wells: string;
+  fact3Mid1: string;
+  fact3Ambulance: string;
+  fact3Mid2: string;
+  fact3Bridge: string;
+  fact3Post: string;
+  quote: string;
+  orderLabel: string;
+  orderSub: string;
+  ceremonyLabel: string;
+  ceremonySub: string;
+  medalAlt: string;
+  ceremonyAlt: string;
+};
+
+const DICT: Dict<T> = {
+  en: {
+    supra: "NATIONAL DISTINCTION",
+    titleA: "KNIGHT OF THE ORDER",
+    titleB: "OF THE STALLION",
+    subArabic: "فارس وسام الحصان — أعلى أوسمة بوركينا فاسو",
+    subtitle: "Chevalier de l'Ordre de l'Étalon · 6 December 2024",
+    badge: "Burkina Faso's Highest Honor",
+    bodyP1: "The Order of the Stallion ",
+    orderParen: "(Ordre de l'Étalon)",
+    bodyP2: " is the highest honorific order of Burkina Faso, established in ",
+    year2017: "2017",
+    bodyP3: " to replace the former National Order. On ",
+    dateCeremony: "6 December 2024",
+    bodyP4: ", in an official state ceremony in Ouagadougou presided by ",
+    traoreName: "Captain Ibrahim Traoré",
+    bodyP5: ", President of the Transition, Ali Konaté was decorated as Knight of the Order in recognition of his exceptional ",
+    patriotism: "patriotism and service",
+    bodyP6: " to the nation.",
+    fact1Pre: "Donated ",
+    fact1Highlight: "200 motorcycles",
+    fact1Post: " to the Volunteers for the Defense of the Fatherland (VDP) and traditional Dozo fighters in the war against terrorism",
+    fact2Pre: "Contributed ",
+    fact2Cement: "100 tons of cement",
+    fact2Mid: " and ",
+    fact2Molds: "1,000 paving molds",
+    fact2Post: " to the presidential initiative ",
+    fact2Initiative: "“Faso Mêô”",
+    fact2End: " for national infrastructure",
+    fact3Pre: "Built dozens of ",
+    fact3Wells: "water wells",
+    fact3Mid1: ", donated an ",
+    fact3Ambulance: "ambulance",
+    fact3Mid2: ", fully rehabilitated the ",
+    fact3Bridge: "Nassou bridge",
+    fact3Post: ", and distributed hundreds of tons of rice and sugar to vulnerable communities",
+    quote: "When a citizen answers his nation's call with his own resources, he becomes more than a businessman — he becomes a pillar of sovereignty.",
+    orderLabel: "Ordre de l'Étalon",
+    orderSub: "Burkina Faso",
+    ceremonyLabel: "Official Ceremony",
+    ceremonySub: "Ouagadougou · 6 Dec 2024",
+    medalAlt: "Ordre de l'Étalon — the authentic Burkinabé medal, a golden star on red-and-green ribbon",
+    ceremonyAlt: "Mr. Ali Konaté wearing the Chevalier of the Order of the Stallion at the 6 December 2024 state ceremony in Ouagadougou",
+  },
+  fr: {
+    supra: "DISTINCTION NATIONALE",
+    titleA: "CHEVALIER DE L'ORDRE",
+    titleB: "DE L'ÉTALON",
+    subArabic: "فارس وسام الحصان — أعلى أوسمة بوركينا فاسو",
+    subtitle: "Chevalier de l'Ordre de l'Étalon · 6 décembre 2024",
+    badge: "Plus haute distinction du Burkina Faso",
+    bodyP1: "L'Ordre de l'Étalon ",
+    orderParen: "(Ordre de l'Étalon)",
+    bodyP2: " est la plus haute distinction honorifique du Burkina Faso, créée en ",
+    year2017: "2017",
+    bodyP3: " pour remplacer l'ancien Ordre National. Le ",
+    dateCeremony: "6 décembre 2024",
+    bodyP4: ", lors d'une cérémonie officielle à Ouagadougou présidée par le ",
+    traoreName: "Capitaine Ibrahim Traoré",
+    bodyP5: ", Président de la Transition, Ali Konaté a été décoré Chevalier de l'Ordre en reconnaissance de son ",
+    patriotism: "patriotisme exceptionnel",
+    bodyP6: " et de ses services rendus à la nation.",
+    fact1Pre: "Don de ",
+    fact1Highlight: "200 motos",
+    fact1Post: " aux Volontaires pour la Défense de la Patrie (VDP) et aux chasseurs traditionnels Dozos dans la lutte contre le terrorisme",
+    fact2Pre: "Contribution de ",
+    fact2Cement: "100 tonnes de ciment",
+    fact2Mid: " et ",
+    fact2Molds: "1 000 moules de pavés",
+    fact2Post: " à l'initiative présidentielle ",
+    fact2Initiative: "« Faso Mêô »",
+    fact2End: " pour les infrastructures nationales",
+    fact3Pre: "Construction de dizaines de ",
+    fact3Wells: "puits d'eau",
+    fact3Mid1: ", don d'une ",
+    fact3Ambulance: "ambulance",
+    fact3Mid2: ", réhabilitation complète du ",
+    fact3Bridge: "pont de Nassou",
+    fact3Post: ", et distribution de centaines de tonnes de riz et de sucre aux populations vulnérables",
+    quote: "Lorsqu'un citoyen répond à l'appel de sa nation avec ses propres ressources, il devient plus qu'un homme d'affaires — il devient un pilier de souveraineté.",
+    orderLabel: "Ordre de l'Étalon",
+    orderSub: "Burkina Faso",
+    ceremonyLabel: "Cérémonie Officielle",
+    ceremonySub: "Ouagadougou · 6 déc. 2024",
+    medalAlt: "Ordre de l'Étalon — la médaille burkinabé authentique, étoile dorée sur ruban rouge et vert",
+    ceremonyAlt: "M. Ali Konaté portant le Chevalier de l'Ordre de l'Étalon lors de la cérémonie d'État du 6 décembre 2024 à Ouagadougou",
+  },
+};
+
+export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
+  const t = DICT[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -69,21 +203,21 @@ export default function MedalBurkina(_props: SceneProps = {}) {
           className="text-center mb-16 md:mb-20"
         >
           <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 opacity-80">
-            NATIONAL DISTINCTION · BURKINA FASO · وسام وطني
+            {t.supra} · BURKINA FASO · وسام وطني
           </div>
 
           <h2 className="font-cinzel text-ivory tracking-[0.15em] text-2xl md:text-4xl lg:text-5xl font-light leading-tight">
-            KNIGHT OF THE ORDER
+            {t.titleA}
             <br />
-            <span className="text-gold-gradient">OF THE STALLION</span>
+            <span className="text-gold-gradient">{t.titleB}</span>
           </h2>
 
           <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
-            فارس وسام الحصان — أعلى أوسمة بوركينا فاسو
+            {t.subArabic}
           </div>
 
           <div className="mt-3 font-cinzel text-ivory/45 tracking-[0.3em] text-[10px] md:text-xs uppercase">
-            Chevalier de l&apos;Ordre de l&apos;Étalon · 6 December 2024
+            {t.subtitle}
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-4 text-gold/50">
@@ -105,7 +239,7 @@ export default function MedalBurkina(_props: SceneProps = {}) {
 
               <Image
                 src="/images/medal_burkina.jpg"
-                alt="Ordre de l'Étalon — the authentic Burkinabé medal, a golden star on red-and-green ribbon"
+                alt={t.medalAlt}
                 fill
                 sizes="(max-width: 1024px) 50vw, 20vw"
                 className="object-contain p-4"
@@ -127,10 +261,10 @@ export default function MedalBurkina(_props: SceneProps = {}) {
             <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-gold pointer-events-none" />
 
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
-              Ordre de l&apos;Étalon
+              {t.orderLabel}
             </div>
             <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
-              Burkina Faso
+              {t.orderSub}
             </div>
           </motion.div>
 
@@ -138,23 +272,22 @@ export default function MedalBurkina(_props: SceneProps = {}) {
           <motion.div style={{ opacity: textOpacity, y: textY }} className="relative">
             <div className="inline-block px-4 py-1.5 border border-gold/30 bg-gold/5 backdrop-blur-sm mb-6">
               <div className="font-cinzel text-gold tracking-[0.3em] text-[10px] uppercase">
-                Burkina Faso&apos;s Highest Honor
+                {t.badge}
               </div>
             </div>
 
             <p className="font-cairo text-ivory/85 text-sm md:text-base leading-relaxed">
-              The Order of the Stallion{" "}
-              <span className="text-ivory/60">(Ordre de l&apos;Étalon)</span> is
-              the highest honorific order of Burkina Faso, established in{" "}
-              <span className="text-gold">2017</span> to replace the former
-              National Order. On{" "}
-              <span className="text-gold">6 December 2024</span>, in an official
-              state ceremony in Ouagadougou presided by{" "}
-              <span className="text-ivory">Captain Ibrahim Traoré</span>,
-              President of the Transition, Ali Konaté was decorated as Knight of
-              the Order in recognition of his exceptional{" "}
-              <span className="text-ivory">patriotism and service</span> to the
-              nation.
+              {t.bodyP1}
+              <span className="text-ivory/60">{t.orderParen}</span>
+              {t.bodyP2}
+              <span className="text-gold">{t.year2017}</span>
+              {t.bodyP3}
+              <span className="text-gold">{t.dateCeremony}</span>
+              {t.bodyP4}
+              <span className="text-ivory">{t.traoreName}</span>
+              {t.bodyP5}
+              <span className="text-ivory">{t.patriotism}</span>
+              {t.bodyP6}
             </p>
 
             {/* Three contribution facts */}
@@ -163,9 +296,9 @@ export default function MedalBurkina(_props: SceneProps = {}) {
                 n="1"
                 text={
                   <>
-                    Donated <span className="text-gold">200 motorcycles</span> to
-                    the Volunteers for the Defense of the Fatherland (VDP) and
-                    traditional Dozo fighters in the war against terrorism
+                    {t.fact1Pre}
+                    <span className="text-gold">{t.fact1Highlight}</span>
+                    {t.fact1Post}
                   </>
                 }
               />
@@ -173,12 +306,13 @@ export default function MedalBurkina(_props: SceneProps = {}) {
                 n="2"
                 text={
                   <>
-                    Contributed{" "}
-                    <span className="text-gold">100 tons of cement</span> and{" "}
-                    <span className="text-gold">1,000 paving molds</span> to the
-                    presidential initiative{" "}
-                    <em className="text-ivory not-italic">“Faso Mêbô”</em> for
-                    national infrastructure
+                    {t.fact2Pre}
+                    <span className="text-gold">{t.fact2Cement}</span>
+                    {t.fact2Mid}
+                    <span className="text-gold">{t.fact2Molds}</span>
+                    {t.fact2Post}
+                    <em className="text-ivory not-italic">{t.fact2Initiative}</em>
+                    {t.fact2End}
                   </>
                 }
               />
@@ -186,13 +320,13 @@ export default function MedalBurkina(_props: SceneProps = {}) {
                 n="3"
                 text={
                   <>
-                    Built dozens of{" "}
-                    <span className="text-ivory">water wells</span>, donated an{" "}
-                    <span className="text-ivory">ambulance</span>, fully
-                    rehabilitated the{" "}
-                    <span className="text-gold">Nassou bridge</span>, and
-                    distributed hundreds of tons of rice and sugar to vulnerable
-                    communities
+                    {t.fact3Pre}
+                    <span className="text-ivory">{t.fact3Wells}</span>
+                    {t.fact3Mid1}
+                    <span className="text-ivory">{t.fact3Ambulance}</span>
+                    {t.fact3Mid2}
+                    <span className="text-gold">{t.fact3Bridge}</span>
+                    {t.fact3Post}
                   </>
                 }
               />
@@ -202,9 +336,7 @@ export default function MedalBurkina(_props: SceneProps = {}) {
             <blockquote className="mt-10 relative pl-5 md:pl-6 border-l-2 border-gold/40">
               <p className="font-cairo italic text-ivory/75 text-sm md:text-base leading-relaxed">
                 <span className="text-gold/70 font-cinzel text-xl mr-1">“</span>
-                When a citizen answers his nation&apos;s call with his own
-                resources, he becomes more than a businessman — he becomes a
-                pillar of sovereignty.
+                {t.quote}
                 <span className="text-gold/70 font-cinzel text-xl ml-1">”</span>
               </p>
             </blockquote>
@@ -220,7 +352,7 @@ export default function MedalBurkina(_props: SceneProps = {}) {
 
               <Image
                 src="/images/ali_burkina_ceremony.png"
-                alt="Mr. Ali Konaté wearing the Chevalier of the Order of the Stallion at the 6 December 2024 state ceremony in Ouagadougou"
+                alt={t.ceremonyAlt}
                 fill
                 sizes="(max-width: 1024px) 60vw, 25vw"
                 className="object-cover object-[50%_25%]"
@@ -251,10 +383,10 @@ export default function MedalBurkina(_props: SceneProps = {}) {
             <div className="absolute -bottom-1 -right-1 w-7 h-7 border-b-2 border-r-2 border-gold pointer-events-none" />
 
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
-              Official Ceremony
+              {t.ceremonyLabel}
             </div>
             <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
-              Ouagadougou · 6 Dec 2024
+              {t.ceremonySub}
             </div>
           </motion.div>
         </div>

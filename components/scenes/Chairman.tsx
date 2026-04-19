@@ -17,9 +17,72 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import type { SceneProps } from "@/lib/i18n";
+import type { Dict, SceneProps } from "@/lib/i18n";
 
-export default function Chairman(_props: SceneProps = {}) {
+const DICT: Dict<{
+  supra: string;
+  mrName: string;
+  titleSub: string;
+  credentials: string;
+  knightLabel: string;
+  maliOrder: string;
+  stallionOrder: string;
+  dozoba: string;
+  dozobaSub: string;
+  sovereignLeadership: string;
+  kangalaHolding: string;
+  sovereign: string;
+  statesman: string;
+  community: string;
+  portraitAlt: string;
+  thumbSovereignAlt: string;
+  thumbStatesmanAlt: string;
+  thumbCommunityAlt: string;
+}> = {
+  en: {
+    supra: "THE CHAIRMAN",
+    mrName: "Mr. Ali Konaté",
+    titleSub: "Chairman & CEO  ·  Dozoba Sovereign Chief",
+    credentials: "Sovereign Credentials",
+    knightLabel: "Chevalier",
+    maliOrder: "National Order of Mali",
+    stallionOrder: "Ordre de l'Étalon · Burkina",
+    dozoba: "Dozoba",
+    dozobaSub: "Supreme Community Reference",
+    sovereignLeadership: "Sovereign Leadership",
+    kangalaHolding: "Kangala Holding Group",
+    sovereign: "SOVEREIGN",
+    statesman: "STATESMAN",
+    community: "COMMUNITY",
+    portraitAlt: "Mr. Ali Konaté — Chairman of Kangala Holding Group, in Dozoba ceremonial regalia",
+    thumbSovereignAlt: "Dozoba sovereign chief",
+    thumbStatesmanAlt: "Mr. Ali Konaté receiving the Chevalier of the National Order of Mali",
+    thumbCommunityAlt: "Ali Konaté in Dozo initiation procession",
+  },
+  fr: {
+    supra: "LE PRÉSIDENT",
+    mrName: "M. Ali Konaté",
+    titleSub: "Président-Directeur Général  ·  Chef Souverain Dozoba",
+    credentials: "Références Souveraines",
+    knightLabel: "Chevalier",
+    maliOrder: "Ordre National du Mali",
+    stallionOrder: "Ordre de l'Étalon · Burkina",
+    dozoba: "Dozoba",
+    dozobaSub: "Référence Suprême Communautaire",
+    sovereignLeadership: "Direction Souveraine",
+    kangalaHolding: "Kangala Holding Group",
+    sovereign: "SOUVERAIN",
+    statesman: "HOMME D'ÉTAT",
+    community: "COMMUNAUTÉ",
+    portraitAlt: "M. Ali Konaté — Président de Kangala Holding Group, en regalia cérémonielle Dozoba",
+    thumbSovereignAlt: "Chef souverain Dozoba",
+    thumbStatesmanAlt: "M. Ali Konaté recevant le Chevalier de l'Ordre National du Mali",
+    thumbCommunityAlt: "Ali Konaté dans une procession d'initiation Dozo",
+  },
+};
+
+export default function Chairman({ lang = "en" }: SceneProps = {}) {
+  const t = DICT[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -68,7 +131,7 @@ export default function Chairman(_props: SceneProps = {}) {
           >
             {/* Supra label */}
             <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-6 opacity-80">
-              THE CHAIRMAN · الرئيس
+              {t.supra} · الرئيس
             </div>
 
             {/* Name */}
@@ -79,10 +142,10 @@ export default function Chairman(_props: SceneProps = {}) {
 
             {/* English subtitle */}
             <div className="mt-4 font-cinzel text-gold/80 tracking-[0.35em] text-xs md:text-sm uppercase">
-              Mr. Ali Konaté
+              {t.mrName}
             </div>
             <div className="mt-2 font-cinzel text-ivory/50 tracking-[0.28em] text-[10px] md:text-xs uppercase">
-              Chairman & CEO  ·  Dozoba Sovereign Chief
+              {t.titleSub}
             </div>
 
             {/* Divider */}
@@ -122,26 +185,26 @@ export default function Chairman(_props: SceneProps = {}) {
             {/* Credentials row — cross-references Authority medals + Dozoba status */}
             <div className="mt-16 pt-8 border-t border-gold/15">
               <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[9px] md:text-[10px] uppercase mb-5">
-                Sovereign Credentials
+                {t.credentials}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
                 <CredentialBadge
                   icon="★"
-                  labelEn="Chevalier"
+                  labelEn={t.knightLabel}
                   labelAr="فارس"
-                  subLabel="National Order of Mali"
+                  subLabel={t.maliOrder}
                 />
                 <CredentialBadge
                   icon="★"
-                  labelEn="Chevalier"
+                  labelEn={t.knightLabel}
                   labelAr="فارس"
-                  subLabel="Ordre de l'Étalon · Burkina"
+                  subLabel={t.stallionOrder}
                 />
                 <CredentialBadge
                   icon="◈"
-                  labelEn="Dozoba"
+                  labelEn={t.dozoba}
                   labelAr="دزوبا"
-                  subLabel="Supreme Community Reference"
+                  subLabel={t.dozobaSub}
                 />
               </div>
             </div>
@@ -161,7 +224,7 @@ export default function Chairman(_props: SceneProps = {}) {
                 {/* Hero portrait — Ali Konaté, Chairman (ali_kangala) */}
                 <Image
                   src="/images/ali_kangala.jpeg"
-                  alt="Mr. Ali Konaté — Chairman of Kangala Holding Group, in Dozoba ceremonial regalia"
+                  alt={t.portraitAlt}
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
                   className="object-cover object-[50%_35%]"
@@ -199,10 +262,10 @@ export default function Chairman(_props: SceneProps = {}) {
               <div className="mt-6 text-center">
                 <div className="inline-block relative px-6 py-3 border border-gold/25 bg-sovereign-deep/40 backdrop-blur-sm">
                   <div className="font-cinzel text-gold tracking-[0.3em] text-[10px] md:text-[11px] uppercase">
-                    Sovereign Leadership
+                    {t.sovereignLeadership}
                   </div>
                   <div className="mt-1 font-cinzel text-ivory/60 tracking-[0.25em] text-[8px] md:text-[9px] uppercase">
-                    Kangala Holding Group
+                    {t.kangalaHolding}
                   </div>
                 </div>
               </div>
@@ -211,22 +274,22 @@ export default function Chairman(_props: SceneProps = {}) {
               <div className="mt-8 grid grid-cols-3 gap-2 md:gap-3">
                 <FacetThumb
                   src="/images/ali_tripe2.jpg"
-                  alt="Dozoba sovereign chief"
-                  label="SOVEREIGN"
+                  alt={t.thumbSovereignAlt}
+                  label={t.sovereign}
                   objectPosition="50% 30%"
                   active
                 />
                 <FacetThumb
                   src="/images/ali.jpg"
-                  alt="Mr. Ali Konaté receiving the Chevalier of the National Order of Mali"
-                  label="STATESMAN"
+                  alt={t.thumbStatesmanAlt}
+                  label={t.statesman}
                   objectPosition="50% 25%"
                   filter="brightness(0.94) contrast(1.08) saturate(1.08) sepia(0.04)"
                 />
                 <FacetThumb
                   src="/images/ali_tripe1.jpg"
-                  alt="Ali Konaté in Dozo initiation procession"
-                  label="COMMUNITY"
+                  alt={t.thumbCommunityAlt}
+                  label={t.community}
                   objectPosition="50% 30%"
                 />
               </div>

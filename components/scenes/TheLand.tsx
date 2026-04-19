@@ -20,8 +20,30 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import SovereignMap from "./SovereignMap";
+import type { Dict, SceneProps } from "@/lib/i18n";
 
-export default function TheLand(_props: import("@/lib/i18n").SceneProps = {}) {
+const DICT: Dict<{
+  supra: string;
+  concessionLabel: string;
+  areaLabel: string;
+  scrollReveal: string;
+}> = {
+  en: {
+    supra: "THE LAND · BIRIMIAN BELT",
+    concessionLabel: "Concession · 11.4503°N, 3.0112°W",
+    areaLabel: "Area:",
+    scrollReveal: "SCROLL TO REVEAL",
+  },
+  fr: {
+    supra: "LA TERRE · CEINTURE BIRIMIENNE",
+    concessionLabel: "Concession · 11,4503°N, 3,0112°O",
+    areaLabel: "Superficie :",
+    scrollReveal: "DÉFILER POUR RÉVÉLER",
+  },
+};
+
+export default function TheLand({ lang = "en" }: SceneProps = {}) {
+  const t = DICT[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -68,7 +90,7 @@ export default function TheLand(_props: import("@/lib/i18n").SceneProps = {}) {
               className="relative"
             >
               <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-6 opacity-80">
-                THE LAND · BIRIMIAN BELT
+                {t.supra}
               </div>
 
               <h2 className="font-cairo display-lg font-light text-ivory leading-[1.15] tracking-tight">
@@ -96,7 +118,7 @@ export default function TheLand(_props: import("@/lib/i18n").SceneProps = {}) {
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-gold/60" />
                 <div className="border border-gold/20 bg-sovereign-deep/30 px-7 py-5 backdrop-blur-sm">
                   <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[9px] uppercase mb-2">
-                    Concession · 11.4503°N, 3.0112°W
+                    {t.concessionLabel}
                   </div>
                   <div
                     className="font-cairo text-ivory text-xl md:text-2xl font-light tabular-nums"
@@ -140,7 +162,7 @@ export default function TheLand(_props: import("@/lib/i18n").SceneProps = {}) {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[9px] tracking-[0.5em] pointer-events-none">
-          SCROLL TO REVEAL
+          {t.scrollReveal}
         </div>
       </div>
     </section>

@@ -30,8 +30,9 @@ import {
   AnimatePresence,
   motion,
 } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import type { Dict, SceneProps } from "@/lib/i18n";
 
 // ═══════════════════════════════════════════════════════════════════
 // Types & Data
@@ -48,6 +49,85 @@ type Subsidiary = {
   location: string;
   country: string;
 };
+
+type UiLabels = {
+  supra: string;
+  titleA: string;
+  titleB: string;
+  subArabic: string;
+  subStats: string;
+  footerLine: string;
+  readoutPanel: string;
+  pinnedText: string;
+  preview: string;
+  standby: string;
+  defaultCategory: string;
+  defaultTitle: string;
+  defaultSubsidiariesLabel: string;
+  defaultBackboneLabel: string;
+  defaultCountriesLabel: string;
+  defaultHint: string;
+  nodeWord: string;
+};
+
+const UI: Dict<UiLabels> = {
+  en: {
+    supra: "SOVEREIGN WAR ROOM",
+    titleA: "ASSET",
+    titleB: "ARCHITECTURE",
+    subArabic: "الأذرع التشغيلية وراء الرؤية",
+    subStats: "14 Subsidiaries · 8 Operational Backbone · 3 Countries",
+    footerLine: "Vertically Integrated · From Pit to Port",
+    readoutPanel: "Readout Panel",
+    pinnedText: "Pinned · Press Esc",
+    preview: "Preview",
+    standby: "Standby",
+    defaultCategory: "Kangala Holding Group",
+    defaultTitle: "The Operational Arms Behind the Vision",
+    defaultSubsidiariesLabel: "Subsidiaries",
+    defaultBackboneLabel: "Backbone",
+    defaultCountriesLabel: "Countries",
+    defaultHint: "Hover any node to preview. Click to pin details for extended reading.",
+    nodeWord: "NODE",
+  },
+  fr: {
+    supra: "SALLE DE COMMANDEMENT SOUVERAINE",
+    titleA: "ARCHITECTURE",
+    titleB: "DES ACTIFS",
+    subArabic: "الأذرع التشغيلية وراء الرؤية",
+    subStats: "14 Filiales · 8 Piliers Opérationnels · 3 Pays",
+    footerLine: "Intégration Verticale · De la Mine au Port",
+    readoutPanel: "Panneau d'Affichage",
+    pinnedText: "Épinglé · Appuyez sur Esc",
+    preview: "Aperçu",
+    standby: "Veille",
+    defaultCategory: "Kangala Holding Group",
+    defaultTitle: "Les Bras Opérationnels derrière la Vision",
+    defaultSubsidiariesLabel: "Filiales",
+    defaultBackboneLabel: "Piliers",
+    defaultCountriesLabel: "Pays",
+    defaultHint: "Survolez un nœud pour aperçu. Cliquez pour épingler les détails.",
+    nodeWord: "NŒUD",
+  },
+};
+
+const UiCtx = createContext<UiLabels>(UI.en);
+const SubsCtx = createContext<Subsidiary[] | null>(null);
+function useSubs(): Subsidiary[] {
+  const v = useContext(SubsCtx);
+  return v ?? subsidiaries;
+}
+
+const SUBS_FR: Subsidiary[] = [
+  { num: "01", logo: "/logos/nakala_mine.svg", category: "Métaux Précieux & Mines", name: "Nakala Gold Mine", desc: "Extraction aurifère durable avec programmes de développement communautaire et initiatives de gestion environnementale.", highlight: "Actif central", highlightMeta: "Moteur de revenus principal", location: "Ouagadougou", country: "BF" },
+  { num: "02", logo: "/logos/kgl_transports.svg", category: "Logistique & Énergie", name: "Kangala Transport", desc: "Distribution de carburant et logistique pétrolière en Afrique de l'Ouest avec capacités d'approvisionnement d'urgence.", highlight: "400+ citernes", highlightMeta: "Épine dorsale énergétique régionale", location: "Ouagadougou · Dubaï", country: "BF" },
+  { num: "03", logo: "/logos/kgl_or.svg", category: "Métaux Précieux & Mines", name: "KGL OR", desc: "Commerce éthique de l'or avec essais modernes, tarification transparente et chaînes d'approvisionnement entièrement traçables.", highlight: "Traçabilité complète", highlightMeta: "Sourcing éthique certifié", location: "Ouagadougou", country: "BF" },
+  { num: "04", logo: "/logos/naigaiba_auto.svg", category: "Automobile & Fabrication", name: "Naigaiba Auto Industrie", desc: "Fabrication de camions sur mesure et solutions de véhicules industriels conçus pour l'exploitation minière et les terrains difficiles.", highlight: "Ingénierie interne", highlightMeta: "Disponibilité maximale", location: "Ouagadougou", country: "BF" },
+  { num: "05", logo: "/logos/emirates_diamonds.svg", category: "Métaux Précieux & Trading", name: "Emirates Diamonds & Gold", desc: "Commerce de diamants et d'or en lingots avec évaluation certifiée, coffre-fort sécurisé et services de conseil.", highlight: "3 cargaisons/mois", highlightMeta: "Certifié Kimberley", location: "Dubaï", country: "AE" },
+  { num: "06", logo: "/logos/kangala_air_cargo.svg", category: "Logistique & Fret Aérien", name: "Kangala Express Air Cargo", desc: "Fret aérien international avec vols charters, manutention sécurisée et transport de cargaisons de haute valeur.", highlight: "Hub logistique Dubaï", highlightMeta: "Spécialiste cargaison précieuse", location: "Dubaï", country: "AE" },
+  { num: "07", logo: "/logos/kgl_carriere.svg", category: "Carrière & Granulats", name: "KGL Carrière", desc: "Fourniture de sable, gravier et granulats pour la construction et l'infrastructure minière en Afrique de l'Ouest.", highlight: "Approvisionnement captif", highlightMeta: "Matériaux construction & mines", location: "Bobo-Dioulasso", country: "BF" },
+  { num: "08", logo: "/logos/kgl_industries.svg", category: "Industries & Mines", name: "KGL Industries & Mining Projects", desc: "Ingénierie industrielle et exécution de projets miniers, de la faisabilité aux opérations à grande échelle.", highlight: "Livraison cycle complet", highlightMeta: "De l'ingénierie à la production", location: "Bobo-Dioulasso", country: "BF" },
+];
 
 // Order is meaningful: Nakala (01) at 12 o'clock = "Crown Jewel".
 const subsidiaries: Subsidiary[] = [
@@ -192,7 +272,9 @@ function useIsScrolling(idleDelay = 120) {
 // Main Component
 // ═══════════════════════════════════════════════════════════════════
 
-export default function AssetArchitecture(_props: import("@/lib/i18n").SceneProps = {}) {
+export default function AssetArchitecture({ lang = "en" }: SceneProps = {}) {
+  const t = UI[lang];
+  const items = useMemo(() => (lang === "fr" ? SUBS_FR : subsidiaries), [lang]);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [pinnedIndex, setPinnedIndex] = useState<number | null>(null);
   const isScrolling = useIsScrolling();
@@ -214,6 +296,8 @@ export default function AssetArchitecture(_props: import("@/lib/i18n").SceneProp
   }, []);
 
   return (
+    <UiCtx.Provider value={t}>
+    <SubsCtx.Provider value={items}>
     <section className="relative min-h-screen w-full bg-sovereign overflow-hidden py-24 md:py-32">
       {/* ─── Ambient gold atmosphere ─── */}
       <div
@@ -270,12 +354,14 @@ export default function AssetArchitecture(_props: import("@/lib/i18n").SceneProp
         >
           <div className="inline-flex items-center gap-3 text-gold/60 font-cinzel tracking-[0.3em] text-[10px] md:text-xs uppercase">
             <span className="w-8 h-px bg-gold/40" />
-            Vertically Integrated · From Pit to Port
+            {t.footerLine}
             <span className="w-8 h-px bg-gold/40" />
           </div>
         </motion.div>
       </div>
     </section>
+    </SubsCtx.Provider>
+    </UiCtx.Provider>
   );
 }
 
@@ -284,6 +370,7 @@ export default function AssetArchitecture(_props: import("@/lib/i18n").SceneProp
 // ═══════════════════════════════════════════════════════════════════
 
 function SectionHeader() {
+  const t = useContext(UiCtx);
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -293,21 +380,21 @@ function SectionHeader() {
       className="text-center mb-14 md:mb-20"
     >
       <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 opacity-80">
-        SOVEREIGN WAR ROOM · هندسة الأصول
+        {t.supra} · هندسة الأصول
       </div>
 
       <h2 className="font-cinzel text-ivory tracking-[0.12em] text-2xl md:text-4xl lg:text-5xl font-light leading-tight">
-        ASSET
+        {t.titleA}
         <br />
-        <span className="text-gold-gradient">ARCHITECTURE</span>
+        <span className="text-gold-gradient">{t.titleB}</span>
       </h2>
 
       <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
-        الأذرع التشغيلية وراء الرؤية
+        {t.subArabic}
       </div>
 
       <div className="mt-3 font-cinzel text-ivory/45 tracking-[0.3em] text-[10px] md:text-xs uppercase">
-        14 Subsidiaries · 8 Operational Backbone · 3 Countries
+        {t.subStats}
       </div>
     </motion.div>
   );
@@ -330,6 +417,7 @@ function OrbitalSystem({
   onPin: (i: number) => void;
   isScrolling: boolean;
 }) {
+  const items = useSubs();
   return (
     <div
       className="relative mx-auto"
@@ -377,7 +465,7 @@ function OrbitalSystem({
       <Hub activeIndex={displayIndex} pinned={pinnedIndex !== null} />
 
       {/* 8 orbital nodes */}
-      {subsidiaries.map((s, i) => (
+      {items.map((s, i) => (
         <OrbitalNode
           key={s.num}
           s={s}
@@ -498,7 +586,9 @@ function Hub({
   activeIndex: number | null;
   pinned: boolean;
 }) {
-  const active = activeIndex !== null ? subsidiaries[activeIndex] : null;
+  const items = useSubs();
+  const t = useContext(UiCtx);
+  const active = activeIndex !== null ? items[activeIndex] : null;
   const truncatedName =
     active && active.name.length > 20
       ? active.name.slice(0, 18) + "…"
@@ -565,7 +655,7 @@ function Hub({
               className="px-2"
             >
               <div className="font-cinzel text-gold/70 text-[9px] tracking-[0.3em]">
-                NODE {active.num}
+                {t.nodeWord} {active.num}
               </div>
               <div
                 className="mt-0.5 font-cinzel text-ivory text-[10px] tracking-[0.08em] leading-tight"
@@ -576,7 +666,7 @@ function Hub({
               {pinned && (
                 <div className="mt-1 font-cinzel text-gold text-[7px] tracking-[0.35em] flex items-center justify-center gap-1">
                   <span className="inline-block w-1 h-1 rounded-full bg-gold" />
-                  PINNED
+                  {t.defaultCategory === "Kangala Holding Group" && t.preview === "Aperçu" ? "ÉPINGLÉ" : "PINNED"}
                 </div>
               )}
             </motion.div>
@@ -760,7 +850,9 @@ function DetailPanel({
   pinned: boolean;
   isScrolling: boolean;
 }) {
-  const active = index !== null ? subsidiaries[index] : null;
+  const items = useSubs();
+  const t = useContext(UiCtx);
+  const active = index !== null ? items[index] : null;
 
   return (
     <motion.div
@@ -791,7 +883,7 @@ function DetailPanel({
         {/* Top readout bar */}
         <div className="flex items-center justify-between px-6 py-2 border-b border-gold/15 bg-sovereign-deep/30">
           <div className="font-cinzel text-gold/60 tracking-[0.35em] text-[9px] uppercase">
-            Readout Panel
+            {t.readoutPanel}
           </div>
           <div className="flex items-center gap-2 font-cinzel text-gold/80 tracking-[0.3em] text-[9px] uppercase">
             {pinned ? (
@@ -799,17 +891,17 @@ function DetailPanel({
                 <span className="relative flex w-1.5 h-1.5 rounded-full bg-gold">
                   <span className="absolute inset-0 rounded-full bg-gold/50 animate-ping" />
                 </span>
-                Pinned · Press Esc
+                {t.pinnedText}
               </>
             ) : active ? (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-gold/60" />
-                Preview
+                {t.preview}
               </>
             ) : (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-ivory/30" />
-                Standby
+                {t.standby}
               </>
             )}
           </div>
@@ -832,6 +924,7 @@ function DetailPanel({
 
 // ─── Default panel content (Group summary) ───
 function DefaultDetail() {
+  const t = useContext(UiCtx);
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -861,22 +954,22 @@ function DefaultDetail() {
 
       <div>
         <div className="font-cinzel text-gold tracking-[0.3em] text-[11px] uppercase mb-1">
-          Kangala Holding Group
+          {t.defaultCategory}
         </div>
         <h3 className="font-cinzel text-ivory text-xl md:text-2xl font-light mb-3">
-          The Operational Arms Behind the Vision
+          {t.defaultTitle}
         </h3>
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <StatPill value="14" label="Subsidiaries" />
+          <StatPill value="14" label={t.defaultSubsidiariesLabel} />
           <span className="w-px h-6 bg-gold/20" />
-          <StatPill value="8" label="Backbone" highlight />
+          <StatPill value="8" label={t.defaultBackboneLabel} highlight />
           <span className="w-px h-6 bg-gold/20" />
-          <StatPill value="3" label="Countries" />
+          <StatPill value="3" label={t.defaultCountriesLabel} />
         </div>
 
         <p className="mt-4 font-cairo text-ivory/45 text-xs md:text-sm leading-relaxed">
-          Hover any node to preview. Click to pin details for extended reading.
+          {t.defaultHint}
         </p>
       </div>
     </motion.div>
@@ -910,6 +1003,7 @@ function StatPill({
 
 // ─── Active subsidiary panel content ───
 function SubsidiaryDetail({ s }: { s: Subsidiary }) {
+  const t = useContext(UiCtx);
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -946,7 +1040,7 @@ function SubsidiaryDetail({ s }: { s: Subsidiary }) {
             {s.category}
           </span>
           <span className="flex items-center gap-3 font-cinzel text-[10px] tracking-[0.25em] text-ivory/50">
-            <span>NODE {s.num}</span>
+            <span>{t.nodeWord} {s.num}</span>
             <span className="w-px h-3 bg-gold/30" />
             <span>{s.country}</span>
           </span>
@@ -998,6 +1092,8 @@ function SubsidiaryDetail({ s }: { s: Subsidiary }) {
 // ═══════════════════════════════════════════════════════════════════
 
 function VerticalSpine({ isScrolling }: { isScrolling: boolean }) {
+  const items = useSubs();
+  const t = useContext(UiCtx);
   return (
     <div className="relative max-w-xl mx-auto">
       {/* Hub at top */}
@@ -1035,7 +1131,7 @@ function VerticalSpine({ isScrolling }: { isScrolling: boolean }) {
       </motion.div>
 
       <div className="text-center mt-3 mb-8 font-cinzel text-gold/80 tracking-[0.3em] text-[10px] uppercase">
-        Kangala Holding Group
+        {t.defaultCategory}
       </div>
 
       {/* Connecting vertical line + nodes */}
@@ -1051,7 +1147,7 @@ function VerticalSpine({ isScrolling }: { isScrolling: boolean }) {
         />
 
         <div className="space-y-5">
-          {subsidiaries.map((s, i) => (
+          {items.map((s, i) => (
             <SpineNode key={s.num} s={s} index={i} isScrolling={isScrolling} />
           ))}
         </div>

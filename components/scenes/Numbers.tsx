@@ -8,6 +8,7 @@ import {
   animate,
 } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import type { Dict, SceneProps } from "@/lib/i18n";
 
 type Metric = {
   value: number;
@@ -18,33 +19,41 @@ type Metric = {
   decimals?: number;
 };
 
-// Source: Kangala Sovereign Portfolio — Page 11 (Geological Assets)
-// + Page 13 (Technical Verification). Verified against text_extracted.txt.
-const METRICS: Metric[] = [
-  {
-    value: 118,
-    suffix: " t",
-    labelAr: "هدف الذهب · Au",
-    labelEn: "Gold Target",
+const DICT: Dict<{
+  supra: string;
+  headlineA: string;
+  headlineB: string;
+  footerA: string;
+  footerB: string;
+  metrics: Metric[];
+}> = {
+  en: {
+    supra: "THE NUMBERS · SPEAK",
+    headlineA: "When the numbers speak,",
+    headlineB: "claims fall silent.",
+    footerA: "All figures rest on certified geological studies",
+    footerB: "validated under JORC and NI 43-101 standards",
+    metrics: [
+      { value: 118, suffix: " t", labelAr: "هدف الذهب · Au", labelEn: "Gold Target" },
+      { value: 40, suffix: " km²", labelAr: "مساحة الامتياز", labelEn: "Concession Area" },
+      { value: 94, labelAr: "شذوذ ذهبي مُؤكّد", labelEn: "Gold Anomalies" },
+      { value: 5, suffix: " m", labelAr: "أدنى عمق للـ Saprolite", labelEn: "Min Depth" },
+    ],
   },
-  {
-    value: 40,
-    suffix: " km²",
-    labelAr: "مساحة الامتياز",
-    labelEn: "Concession Area",
+  fr: {
+    supra: "LES CHIFFRES · PARLENT",
+    headlineA: "Quand les chiffres parlent,",
+    headlineB: "les allégations se taisent.",
+    footerA: "Tous les chiffres reposent sur des études géologiques certifiées",
+    footerB: "validées selon les normes JORC et NI 43-101",
+    metrics: [
+      { value: 118, suffix: " t", labelAr: "هدف الذهب · Au", labelEn: "Objectif Or" },
+      { value: 40, suffix: " km²", labelAr: "مساحة الامتياز", labelEn: "Superficie Concession" },
+      { value: 94, labelAr: "شذوذ ذهبي مُؤكّد", labelEn: "Anomalies Aurifères" },
+      { value: 5, suffix: " m", labelAr: "أدنى عمق للـ Saprolite", labelEn: "Profondeur Min." },
+    ],
   },
-  {
-    value: 94,
-    labelAr: "شذوذ ذهبي مُؤكّد",
-    labelEn: "Gold Anomalies",
-  },
-  {
-    value: 5,
-    suffix: " m",
-    labelAr: "أدنى عمق للـ Saprolite",
-    labelEn: "Min Depth",
-  },
-];
+};
 
 function CountUp({ metric }: { metric: Metric }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -77,7 +86,9 @@ function CountUp({ metric }: { metric: Metric }) {
   );
 }
 
-export default function Numbers(_props: import("@/lib/i18n").SceneProps = {}) {
+export default function Numbers({ lang = "en" }: SceneProps = {}) {
+  const t = DICT[lang];
+  const METRICS = t.metrics;
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -125,7 +136,7 @@ export default function Numbers(_props: import("@/lib/i18n").SceneProps = {}) {
           className="text-center mb-24"
         >
           <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-6 opacity-80">
-            THE NUMBERS · SPEAK
+            {t.supra}
           </div>
 
           <h2 className="font-cairo display-lg font-light text-ivory leading-tight tracking-tight">
@@ -192,11 +203,21 @@ export default function Numbers(_props: import("@/lib/i18n").SceneProps = {}) {
           transition={{ duration: 1.5, delay: 0.8 }}
           className="mt-20 text-center"
         >
-          <p className="font-cairo text-ivory/50 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            جميع الأرقام تستند إلى دراسات جيولوجية معتمدة
-            <br />
-            ومصدّقة وفق معايير <span className="text-gold">JORC</span> و{" "}
-            <span className="text-gold">NI 43-101</span>
+          <p className="font-cairo text-ivory/50 text-sm md:text-base max-w-2xl mx-auto leading-relaxed" dir={lang === "fr" ? "ltr" : "rtl"}>
+            {lang === "fr" ? (
+              <>
+                {t.footerA}
+                <br />
+                {t.footerB}
+              </>
+            ) : (
+              <>
+                جميع الأرقام تستند إلى دراسات جيولوجية معتمدة
+                <br />
+                ومصدّقة وفق معايير <span className="text-gold">JORC</span> و{" "}
+                <span className="text-gold">NI 43-101</span>
+              </>
+            )}
           </p>
         </motion.div>
       </div>

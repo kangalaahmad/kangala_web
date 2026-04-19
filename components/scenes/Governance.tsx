@@ -36,6 +36,8 @@
  */
 
 import { motion } from "framer-motion";
+import { createContext, useContext } from "react";
+import type { SceneProps, Lang } from "@/lib/i18n";
 
 // ═══════════════════════════════════════════════════════════════════
 // Data
@@ -249,6 +251,148 @@ const PROTECTIONS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════
+// Bilingual overlay (French) + Context
+// ═══════════════════════════════════════════════════════════════════
+
+type Loc = {
+  act1: { pre: string; title: string; highlight: string; sub: string; flowLbl: string; principlesLbl: string };
+  act2: { pre: string; title: string; highlight: string; sub: string; committeesTitle: string; matrixTitle: string; colCommittee: string; colComposition: string; colMandate: string; colFreq: string };
+  act3: { pre: string; title: string; highlight: string; sub: string };
+  act4: { pre: string; title: string; highlight: string; sub: string; legalTitle: string };
+  decisionFlow: typeof DECISION_FLOW;
+  principles: typeof CORE_PRINCIPLES;
+  orgChain: typeof ORG_CHAIN;
+  committees: typeof COMMITTEES;
+  authority: typeof AUTHORITY_MATRIX;
+  esgPillars: typeof ESG_PILLARS;
+  esgTargets: typeof ESG_TARGETS;
+  disputeTiers: typeof DISPUTE_TIERS;
+  legal: typeof LEGAL_FRAMEWORK;
+  protections: typeof PROTECTIONS;
+  closing: { quote: string; note: string };
+};
+
+const DICT: Record<Lang, Loc> = {
+  en: {
+    act1: { pre: "TRUST FRAMEWORK · حوكمة سيادية", title: "GOVERNANCE", highlight: "MODEL", sub: "Checks, balances, and aligned incentives for sustainable value creation", flowLbl: "Decision Flow", principlesLbl: "Core Principles" },
+    act2: { pre: "Board & Committees", title: "OVERSIGHT", highlight: "STRUCTURE", sub: "Strategic direction, risk management, and transparent governance", committeesTitle: "Committees & Mandates", matrixTitle: "Decision Authority Matrix", colCommittee: "Committee", colComposition: "Composition", colMandate: "Mandate", colFreq: "Freq." },
+    act3: { pre: "Responsible Stewardship", title: "ESG", highlight: "FRAMEWORK", sub: "Sustainable development, community value, and responsible stewardship" },
+    act4: { pre: "Dispute Resolution · الآلية القانونية", title: "ARBITRATION", highlight: "LADDER", sub: "Clear, fair, and internationally recognized mechanisms", legalTitle: "Legal Framework" },
+    decisionFlow: DECISION_FLOW,
+    principles: CORE_PRINCIPLES,
+    orgChain: ORG_CHAIN,
+    committees: COMMITTEES,
+    authority: AUTHORITY_MATRIX,
+    esgPillars: ESG_PILLARS,
+    esgTargets: ESG_TARGETS,
+    disputeTiers: DISPUTE_TIERS,
+    legal: LEGAL_FRAMEWORK,
+    protections: PROTECTIONS,
+    closing: {
+      quote: "“Effective governance aligns incentives, accelerates delivery, and ensures transparency at every stage of the partnership.”",
+      note: "Governance framework subject to final partnership agreement. All mechanisms protect both parties' interests under internationally recognized standards.",
+    },
+  },
+  fr: {
+    act1: { pre: "CADRE DE CONFIANCE · حوكمة سيادية", title: "MODÈLE DE", highlight: "GOUVERNANCE", sub: "Contrôles, équilibres et incitations alignées pour une création de valeur durable", flowLbl: "Processus Décisionnel", principlesLbl: "Principes Fondamentaux" },
+    act2: { pre: "Conseil & Comités", title: "STRUCTURE DE", highlight: "SUPERVISION", sub: "Direction stratégique, gestion des risques et gouvernance transparente", committeesTitle: "Comités & Mandats", matrixTitle: "Matrice d'Autorité Décisionnelle", colCommittee: "Comité", colComposition: "Composition", colMandate: "Mandat", colFreq: "Fréq." },
+    act3: { pre: "Gestion Responsable", title: "CADRE", highlight: "ESG", sub: "Développement durable, valeur communautaire et gestion responsable" },
+    act4: { pre: "Résolution des Litiges · الآلية القانونية", title: "ÉCHELLE", highlight: "D'ARBITRAGE", sub: "Mécanismes clairs, équitables et internationalement reconnus", legalTitle: "Droit Applicable" },
+    decisionFlow: [
+      { num: "01", title: "Proposition", desc: "L'une des parties initie un nouveau chantier, une demande budgétaire ou un programme technique via le Bureau Technique Conjoint.", owner: "Kangala ou Partenaire" },
+      { num: "02", title: "Revue Technique", desc: "Le Bureau Technique Conjoint évalue la faisabilité, les risques et l'alignement stratégique. Les deux parties participent à l'évaluation.", owner: "Comité Technique" },
+      { num: "03", title: "Approbation Financière", desc: "Le Comité Financier examine l'impact budgétaire et la trésorerie. Double signature requise pour les dépenses supérieures à 100\u202fK$.", owner: "Comité Financier" },
+      { num: "04", title: "Ratification du Conseil", desc: "Le Conseil Conjoint accorde l'approbation finale pour les décisions matérielles. Le Président indépendant assure une délibération équilibrée.", owner: "Conseil Conjoint" },
+      { num: "05", title: "Exécution", desc: "La Direction de la JV met en œuvre le programme approuvé avec des KPI définis, des calendriers et des jalons de reporting.", owner: "Direction JV" },
+    ],
+    principles: [
+      { n: "1", title: "Transparence", desc: "Toutes les données financières, opérationnelles et techniques partagées équitablement entre les partenaires via un portail sécurisé avec accès en temps réel." },
+      { n: "2", title: "Responsabilité", desc: "Responsabilité claire à chaque étape décisionnelle. Approbations documentées, pistes d'audit et revues de performance trimestrielles." },
+      { n: "3", title: "Incitations Alignées", desc: "Structure de risque-rendement partagée garantissant que les deux parties bénéficient du succès du projet et assument les conséquences d'une sous-performance." },
+      { n: "4", title: "Exécution Rapide", desc: "Autorité déléguée pour les décisions opérationnelles éliminant les goulets d'étranglement. Seules les décisions matérielles sont escaladées au Conseil." },
+    ],
+    orgChain: [
+      { label: "Conseil Conjoint", sub: "Direction Stratégique", primary: true },
+      { label: "Audit & Risques", sub: "Conformité & Contrôles" },
+      { label: "Comité Technique", sub: "Opérations & Programmes" },
+      { label: "Comité ESG", sub: "Durabilité & Impact" },
+      { label: "Direction JV", sub: "Exécution Quotidienne", primary: true },
+    ],
+    committees: [
+      { name: "Conseil Conjoint", comp: "3 Kangala + 3 Partenaire + Président indépendant", mandate: "Stratégie, approbation du budget, décisions majeures", freq: "Trimestrielle" },
+      { name: "Audit & Risques", comp: "2 Kangala + 2 Partenaire + Auditeur externe", mandate: "Contrôles financiers, conformité, registre des risques", freq: "Trimestrielle" },
+      { name: "Comité Technique", comp: "2 Kangala + 2 géologues & ingénieurs Partenaire", mandate: "Programmes d'exploration, forage, planification minière", freq: "Mensuelle" },
+      { name: "Comité ESG", comp: "1 Kangala + 1 Partenaire + Repr. communautaire", mandate: "Environnement, impact social, contenu local", freq: "Semestrielle" },
+      { name: "Comité Financier", comp: "DAF des deux parties", mandate: "Trésorerie, tirages CAPEX, distributions", freq: "Mensuelle" },
+    ],
+    authority: [
+      { key: "Approbation du budget annuel", val: "Conseil Conjoint" },
+      { key: "CAPEX > 500\u202fK$", val: "Conseil Conjoint" },
+      { key: "CAPEX 100\u202fK$ – 500\u202fK$", val: "Comité Financier" },
+      { key: "Modifications du programme d'exploration", val: "Comité Technique" },
+      { key: "Investissement communautaire > 50\u202fK$", val: "Comité ESG" },
+      { key: "États financiers trimestriels", val: "Audit & Risques" },
+      { key: "Opérations courantes", val: "Direction JV" },
+    ],
+    esgPillars: [
+      { letter: "E", title: "Environnement", accent: "#1A3A2A", items: [
+        { k: "Gestion de l'Eau", v: "Systèmes de recyclage en circuit fermé pour minimiser la consommation d'eau douce" },
+        { k: "Biodiversité", v: "Études de référence pré-exploitation et réhabilitation progressive des zones exploitées" },
+        { k: "Émissions", v: "Production d'énergie solaire hybride pour réduire l'empreinte carbone de 40%" },
+        { k: "Déchets", v: "Gestion des résidus selon la Norme Industrielle Mondiale de l'ICMM" },
+      ]},
+      { letter: "S", title: "Social", accent: "#7A1F1F", items: [
+        { k: "Emploi Local", v: "80%+ de la main-d'œuvre issue des Hauts-Bassins et des régions environnantes" },
+        { k: "Santé & Éducation", v: "Clinique communautaire et centre de formation professionnelle à Karangasso" },
+        { k: "Sécurité", v: "Objectif zéro accident avec gestion de la santé au travail ISO 45001" },
+        { k: "Travail Équitable", v: "Salaire décent garanti\u202f; politique d'interdiction du travail des enfants et du travail forcé" },
+      ]},
+      { letter: "G", title: "Gouvernance", accent: "#B8954A", items: [
+        { k: "Anti-Corruption", v: "Conformité totale aux lois anti-corruption et anti-blanchiment des EAU et aux normes internationales" },
+        { k: "Transparence ITIE", v: "Divulgation publique de tous les paiements aux entités gouvernementales" },
+        { k: "Supervision du Conseil", v: "Comité ESG indépendant avec reporting trimestriel" },
+        { k: "Lanceur d'Alerte", v: "Canal de signalement anonyme avec enquête indépendante" },
+      ]},
+    ],
+    esgTargets: [
+      { val: "80%+", lbl: "Main-d'Œuvre Locale" },
+      { val: "40%", lbl: "Réduction Carbone" },
+      { val: "Zéro", lbl: "Objectif Accident" },
+      { val: "ISO", lbl: "45001 Certifié" },
+      { val: "ITIE", lbl: "Conformité Totale" },
+    ],
+    disputeTiers: [
+      { step: "1", title: "Négociation Directe", timeline: "0 – 30 jours", desc: "Négociation directe entre les représentants seniors autorisés des deux parties. Discussions de bonne foi pour résoudre les problèmes à l'amiable et préserver la relation commerciale.", meta: [ { k: "Niveau", v: "PDG / Directeur Général" }, { k: "Lieu", v: "Dubaï ou Ouagadougou" } ] },
+      { step: "2", title: "Médiation", timeline: "30 – 90 jours", desc: "Engagement d'un médiateur tiers neutre désigné d'un commun accord. Processus facilité non contraignant visant à parvenir à une résolution mutuellement acceptable.", meta: [ { k: "Institution", v: "Médiation LCIA / DIAC" }, { k: "Siège", v: "Dubaï, EAU" } ] },
+      { step: "3", title: "Arbitrage Contraignant", timeline: "90 – 365 jours", desc: "Arbitrage définitif et contraignant selon les règles internationales. Sentence exécutoire internationalement dans plus de 170 juridictions.", meta: [ { k: "Règles", v: "CNUDCI / LCIA" }, { k: "Arbitres", v: "Tribunal de 3 membres" }, { k: "Langue", v: "Anglais (principal)" } ] },
+    ],
+    legal: [
+      { k: "Droit Applicable", v: "Acte Uniforme OHADA & Code Minier du Burkina Faso 2015" },
+      { k: "Siège de l'Arbitrage", v: "Centre Financier International de Dubaï (DIFC)" },
+      { k: "Institution Arbitrale", v: "Centre d'Arbitrage International de Dubaï (DIAC)" },
+      { k: "Langue", v: "Anglais et Français (procédure bilingue)" },
+      { k: "Composition", v: "Trois arbitres — un par partie, le troisième désigné par le DIAC" },
+      { k: "Exécution", v: "International — 170+ États signataires" },
+      { k: "Mesures Provisoires", v: "Arbitre d'urgence disponible sous 15 jours" },
+      { k: "Confidentialité", v: "Toutes les procédures sont strictement confidentielles" },
+    ],
+    protections: [
+      { title: "Protection des Investisseurs", desc: "Protections du TBI EAU–Burkina Faso applicables." },
+      { title: "Garantie Souveraine", desc: "La convention minière garantit la stabilité des conditions fiscales." },
+    ],
+    closing: {
+      quote: "«\u202fUne gouvernance efficace aligne les incitations, accélère la livraison et assure la transparence à chaque étape du partenariat.\u202f»",
+      note: "Cadre de gouvernance soumis à l'accord de partenariat final. Tous les mécanismes protègent les intérêts des deux parties selon des normes internationalement reconnues.",
+    },
+  },
+};
+
+const LocCtx = createContext<Loc>(DICT.en);
+function useLoc(): Loc {
+  return useContext(LocCtx);
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // Shared primitives
 // ═══════════════════════════════════════════════════════════════════
 
@@ -312,8 +456,9 @@ function ActHeader({
 // Main
 // ═══════════════════════════════════════════════════════════════════
 
-export default function Governance(_props: import("@/lib/i18n").SceneProps = {}) {
+export default function Governance({ lang = "en" }: SceneProps = {}) {
   return (
+    <LocCtx.Provider value={DICT[lang]}>
     <section className="relative w-full bg-ivory text-sovereign overflow-hidden">
       {/* Akan diagonal watermark */}
       <div
@@ -349,6 +494,7 @@ export default function Governance(_props: import("@/lib/i18n").SceneProps = {})
         }}
       />
     </section>
+    </LocCtx.Provider>
   );
 }
 
@@ -357,23 +503,24 @@ export default function Governance(_props: import("@/lib/i18n").SceneProps = {})
 // ═══════════════════════════════════════════════════════════════════
 
 function GovernanceAct() {
+  const t = useLoc();
   return (
     <div className="relative py-20 md:py-28">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         <ActHeader
-          pre="TRUST FRAMEWORK · حوكمة سيادية"
-          title="GOVERNANCE"
-          highlight="MODEL"
-          sub="Checks, balances, and aligned incentives for sustainable value creation"
+          pre={t.act1.pre}
+          title={t.act1.title}
+          highlight={t.act1.highlight}
+          sub={t.act1.sub}
         />
 
         {/* 5-step decision flow */}
         <div className="mb-10 md:mb-14">
           <div className="font-cinzel text-gold tracking-[0.35em] text-[10px] uppercase mb-3">
-            Decision Flow
+            {t.act1.flowLbl}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
-            {DECISION_FLOW.map((step, i) => (
+            {t.decisionFlow.map((step, i) => (
               <motion.div
                 key={step.num}
                 initial={{ opacity: 0, y: 30 }}
@@ -415,10 +562,10 @@ function GovernanceAct() {
         {/* Core principles */}
         <div>
           <div className="font-cinzel text-gold tracking-[0.35em] text-[10px] uppercase mb-3">
-            Core Principles
+            {t.act1.principlesLbl}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-            {CORE_PRINCIPLES.map((p, i) => (
+            {t.principles.map((p, i) => (
               <motion.div
                 key={p.n}
                 initial={{ opacity: 0, x: -20 }}
@@ -453,20 +600,21 @@ function GovernanceAct() {
 // ═══════════════════════════════════════════════════════════════════
 
 function BoardAct() {
+  const t = useLoc();
   return (
     <div className="relative py-20 md:py-28 border-t border-gold/25 bg-ivory-dark/25">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         <ActHeader
-          pre="Board & Committees"
-          title="OVERSIGHT"
-          highlight="STRUCTURE"
-          sub="Strategic direction, risk management, and transparent governance"
+          pre={t.act2.pre}
+          title={t.act2.title}
+          highlight={t.act2.highlight}
+          sub={t.act2.sub}
         />
 
         {/* Org chain strip */}
         <div className="mb-10">
           <div className="flex flex-col md:flex-row items-stretch gap-2 md:gap-0">
-            {ORG_CHAIN.map((node, i) => (
+            {t.orgChain.map((node, i) => (
               <div key={node.label} className="flex items-center flex-1">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -493,7 +641,7 @@ function BoardAct() {
                     {node.sub}
                   </div>
                 </motion.div>
-                {i < ORG_CHAIN.length - 1 && (
+                {i < t.orgChain.length - 1 && (
                   <div className="hidden md:flex items-center justify-center w-6 text-gold flex-shrink-0">
                     ▶
                   </div>
@@ -505,21 +653,21 @@ function BoardAct() {
 
         {/* Two-column: Committees table + Authority Matrix */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5 md:gap-6">
-          <TableCard title="Committees & Mandates">
+          <TableCard title={t.act2.committeesTitle}>
             <table className="w-full text-left">
               <thead>
                 <tr
                   className="font-cinzel text-ivory tracking-[0.2em] text-[9px] uppercase"
                   style={{ background: "#0A192F", borderBottom: "3px solid #B8954A" }}
                 >
-                  <th className="px-3 md:px-4 py-2.5">Committee</th>
-                  <th className="px-3 md:px-4 py-2.5">Composition</th>
-                  <th className="px-3 md:px-4 py-2.5">Mandate</th>
-                  <th className="px-3 md:px-4 py-2.5">Freq.</th>
+                  <th className="px-3 md:px-4 py-2.5">{t.act2.colCommittee}</th>
+                  <th className="px-3 md:px-4 py-2.5">{t.act2.colComposition}</th>
+                  <th className="px-3 md:px-4 py-2.5">{t.act2.colMandate}</th>
+                  <th className="px-3 md:px-4 py-2.5">{t.act2.colFreq}</th>
                 </tr>
               </thead>
               <tbody className="font-cormorant text-sovereign/90 text-[12.5px] md:text-[13px]">
-                {COMMITTEES.map((c, i) => (
+                {t.committees.map((c, i) => (
                   <tr
                     key={c.name}
                     className={i % 2 === 1 ? "bg-gold/5" : ""}
@@ -539,9 +687,9 @@ function BoardAct() {
             </table>
           </TableCard>
 
-          <TableCard title="Decision Authority Matrix">
+          <TableCard title={t.act2.matrixTitle}>
             <div className="divide-y divide-gold/15">
-              {AUTHORITY_MATRIX.map((row) => (
+              {t.authority.map((row) => (
                 <div
                   key={row.key}
                   className="flex items-center justify-between gap-3 px-3 md:px-4 py-2.5"
@@ -599,19 +747,20 @@ function TableCard({
 // ═══════════════════════════════════════════════════════════════════
 
 function EsgAct() {
+  const t = useLoc();
   return (
     <div className="relative py-20 md:py-28 border-t border-gold/25">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         <ActHeader
-          pre="Responsible Stewardship"
-          title="ESG"
-          highlight="FRAMEWORK"
-          sub="Sustainable development, community value, and responsible stewardship"
+          pre={t.act3.pre}
+          title={t.act3.title}
+          highlight={t.act3.highlight}
+          sub={t.act3.sub}
         />
 
         {/* 3 pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-10">
-          {ESG_PILLARS.map((p, i) => (
+          {t.esgPillars.map((p, i) => (
             <motion.div
               key={p.letter}
               initial={{ opacity: 0, y: 30 }}
@@ -677,17 +826,17 @@ function EsgAct() {
           transition={{ duration: 0.9 }}
           className="grid grid-cols-2 md:grid-cols-5 gap-px bg-gold/30"
         >
-          {ESG_TARGETS.map((t) => (
+          {t.esgTargets.map((item) => (
             <div
-              key={t.lbl}
+              key={item.lbl}
               className="bg-sovereign text-center py-5 px-3 relative"
             >
               <span className="absolute top-0 left-[25%] right-[25%] h-[3px] bg-gold" />
               <div className="font-cinzel text-gold text-2xl md:text-3xl font-light">
-                {t.val}
+                {item.val}
               </div>
               <div className="mt-1.5 font-cinzel text-ivory/60 tracking-[0.2em] text-[9px] uppercase">
-                {t.lbl}
+                {item.lbl}
               </div>
             </div>
           ))}
@@ -702,19 +851,20 @@ function EsgAct() {
 // ═══════════════════════════════════════════════════════════════════
 
 function DisputeAct() {
+  const t = useLoc();
   return (
     <div className="relative py-20 md:py-28 border-t border-gold/25 bg-ivory-dark/25">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         <ActHeader
-          pre="Dispute Resolution · الآلية القانونية"
-          title="ARBITRATION"
-          highlight="LADDER"
-          sub="Clear, fair, and internationally recognized mechanisms"
+          pre={t.act4.pre}
+          title={t.act4.title}
+          highlight={t.act4.highlight}
+          sub={t.act4.sub}
         />
 
         {/* 3-tier ladder */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-10">
-          {DISPUTE_TIERS.map((tier, i) => (
+          {t.disputeTiers.map((tier, i) => (
             <motion.div
               key={tier.step}
               initial={{ opacity: 0, y: 30 }}
@@ -767,9 +917,9 @@ function DisputeAct() {
 
         {/* Legal Framework + Protections */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5 md:gap-6">
-          <TableCard title="Legal Framework">
+          <TableCard title={t.act4.legalTitle}>
             <div className="divide-y divide-gold/15">
-              {LEGAL_FRAMEWORK.map((r) => (
+              {t.legal.map((r) => (
                 <div
                   key={r.k}
                   className="grid grid-cols-[140px_1fr] md:grid-cols-[180px_1fr] gap-3 px-3 md:px-4 py-2.5"
@@ -786,7 +936,7 @@ function DisputeAct() {
           </TableCard>
 
           <div className="space-y-3 md:space-y-4">
-            {PROTECTIONS.map((p, i) => (
+            {t.protections.map((p, i) => (
               <motion.div
                 key={p.title}
                 initial={{ opacity: 0, x: 20 }}
@@ -821,6 +971,7 @@ function DisputeAct() {
 // ═══════════════════════════════════════════════════════════════════
 
 function ClosingDoctrine() {
+  const t = useLoc();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -833,14 +984,11 @@ function ClosingDoctrine() {
       <div className="container mx-auto px-6 md:px-12 max-w-5xl">
         <div className="flex flex-col md:flex-row items-center gap-5 md:gap-8">
           <blockquote className="flex-1 font-cormorant italic text-gold text-lg md:text-2xl leading-relaxed">
-            “Effective governance aligns incentives, accelerates delivery, and
-            ensures transparency at every stage of the partnership.”
+            {t.closing.quote}
           </blockquote>
           <div className="hidden md:block w-px h-16 bg-gold/40" />
           <p className="flex-[0.55] font-cormorant text-ivory/75 text-[13px] md:text-sm leading-relaxed">
-            Governance framework subject to final partnership agreement. All
-            mechanisms protect both parties' interests under internationally
-            recognized standards.
+            {t.closing.note}
           </p>
         </div>
       </div>
