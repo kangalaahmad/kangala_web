@@ -963,7 +963,6 @@ function MobilePipeline({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
           height: "100svh",
           overflowY: "scroll",
           scrollSnapType: "y mandatory",
-          overscrollBehavior: "contain",
         }}
       >
         {/* Slide 0 — Hub intro */}
