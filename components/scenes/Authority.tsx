@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { EASE } from "@/lib/easing";
 
 // Source: Kangala Sovereign Portfolio — page 07_medal (Mali) + page 07b_medal_burkina
 // Both medals personally conferred; details verified from official state ceremonies.
@@ -91,7 +92,7 @@ export default function Authority() {
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1.2, delay: i * 0.2, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.2, delay: i * 0.2, ease: EASE.SPRING }}
               className="group relative"
             >
               {/* Medal visual */}
@@ -139,7 +140,7 @@ export default function Authority() {
                   <div className="font-cairo text-sovereign/75 text-xs md:text-sm leading-relaxed">
                     {m.noteAr}
                   </div>
-                  <div className="font-cinzel text-gold/60 tracking-[0.25em] text-[9px] uppercase mt-3">
+                  <div className="font-cinzel text-gold/60 tracking-[0.25em] text-[11px] uppercase mt-3">
                     {m.year}
                   </div>
                 </div>

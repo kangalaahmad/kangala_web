@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
 import { loginAction, type LoginState } from "@/app/actions/auth";
+import { EASE } from "@/lib/easing";
 import { useEffect, useRef } from "react";
 
 const initial: LoginState = { ok: false };
@@ -45,7 +46,7 @@ export default function GateForm() {
   return (
     <motion.div
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] } }}
+      exit={{ opacity: 0, transition: { duration: 1.2, ease: EASE.HOVER } }}
       className="fixed inset-0 z-[100] bg-sovereign flex items-center justify-center px-6"
     >
       {/* Ambient gradient */}
@@ -71,7 +72,7 @@ export default function GateForm() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.5, delay: 0.3, ease: EASE.HOVER }}
           className="mb-16 flex flex-col items-center"
         >
           <div className="w-20 h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-60 mb-6" />

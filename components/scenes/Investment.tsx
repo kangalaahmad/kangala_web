@@ -37,7 +37,8 @@
 
 import { motion, useInView, animate } from "framer-motion";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
 // ═══════════════════════════════════════════════════════════════════
 // Data
@@ -75,7 +76,7 @@ type Loc = {
   disclaimer: { title: string; bodyPre: string; bodyInf: string; bodyMid: string; goldPrice: string; bodyMid2: string; aisc: string; bodyEnd: string };
 };
 
-const DICT: Dict<Loc> = {
+const DICT: FullDict<Loc> = {
   en: {
     hero: { supra: "INVESTMENT CASE", titleA: "THE MONEY", titleB: "ARGUMENT", subtitle: "Three scenarios · Base ROI 2.3× · Gold @ $2,350 / oz", baseReturn: "Base Case Return", onCapex: "On", netProfit: "CAPEX · Net profit", mineLife: "over 5–7 year mine life." },
     keyMetrics: [
@@ -248,6 +249,92 @@ const DICT: Dict<Loc> = {
     },
     disclaimer: { title: "Avertissement Important", bodyPre: "Ce cas d'investissement est basé sur des ", bodyInf: "ressources Inférées", bodyMid: " (JORC 2012). Les déclarations prospectives impliquent risque et incertitude\u202f; les résultats réels peuvent différer matériellement. Hypothèse prix de l'or\u202f: ", goldPrice: "2\u202f350 $ / oz", bodyMid2: ". OPEX modélisé à ", aisc: "1\u202f200 $ / oz AISC", bodyEnd: ". Tous les termes de partenariat sont indicatifs et soumis à accord final. Ce document ne constitue pas un conseil financier. Une due diligence indépendante est recommandée." },
   },
+  ar: {
+    hero: { supra: "دراسة الاستثمار", titleA: "الحُجّة", titleB: "المالية", subtitle: "ثلاثة سيناريوهات · عائد الحالة الأساسية ‎2.3×‎ · الذهب بسعر $2,350 / أونصة", baseReturn: "عائد الحالة الأساسية", onCapex: "على", netProfit: "الإنفاق الرأسمالي · صافي الربح", mineLife: "طوال عمر المنجم 5–7 سنوات." },
+    keyMetrics: [
+      { val: "2.3x", lbl: "عائد الحالة الأساسية", highlight: true },
+      { val: "$128M", lbl: "صافي الربح (الأساسي)" },
+      { val: "$1,200", lbl: "AISC للأونصة" },
+      { val: "5–7 سنوات", lbl: "عمر المنجم" },
+      { val: "$2,350", lbl: "سعر الذهب الأساسي" },
+      { val: "$55M", lbl: "إجمالي الإنفاق الرأسمالي" },
+    ],
+    scen: { header: "تحليل سيناريوهات الاستثمار", subtitle: "ثلاث نتائج نمذجية — كلها تفترض سعر ذهب $2,350 / أونصة", colScenario: "السيناريو", colResource: "الموارد (أونصة)", colGross: "الإيراد الإجمالي", colCapex: "رأسمالي", colOpex: "تشغيلي", colTax: "ضرائب", colNet: "صافي الربح", colRoi: "العائد" },
+    scenarios: [
+      { name: "متحفّظ", resource: "125,000", gross: "$294M", capex: "$50M", opex: "$150M", tax: "$30M", net: "$64M", roi: "1.3x", highlight: false },
+      { name: "الحالة الأساسية", resource: "200,000", gross: "$470M", capex: "$55M", opex: "$240M", tax: "$47M", net: "$128M", roi: "2.3x", highlight: true },
+      { name: "صاعد", resource: "300,000", gross: "$705M", capex: "$65M", opex: "$360M", tax: "$71M", net: "$209M", roi: "3.2x", highlight: false },
+    ],
+    waterfall: { header: "شلال الأرباح والخسائر — الحالة الأساسية · 200 ألف أونصة", subtitle: "من الإيراد الإجمالي إلى صافي الربح — كل دولار موثّق", rows: [
+      { label: "الإيراد الإجمالي", value: "$470M", width: 100, type: "positive" },
+      { label: "OPEX (بمعدل $1,200/أونصة)", value: "-$240M", width: 51, type: "negative" },
+      { label: "CAPEX", value: "-$55M", width: 12, type: "negative" },
+      { label: "الضرائب والإتاوات", value: "-$47M", width: 10, type: "negative" },
+      { label: "صافي الربح", value: "$128M", width: 27, type: "result" },
+    ] },
+    risk: { header: "تقييم المخاطر", subtitle: "خريطة تعرّض معايرة — تعكس كثافة الذهب درجة الخطر", rows: [
+      { name: "المخاطر الجيولوجية (العيار مؤكد بـ RC)", level: "منخفض", intensity: 25 },
+      { name: "تقلّب سعر الذهب", level: "متوسط", intensity: 50 },
+      { name: "التراخيص (مؤمّنة حتى 2030)", level: "منخفض", intensity: 20 },
+      { name: "المخاطر السياسية / التنظيمية", level: "متوسط", intensity: 45 },
+      { name: "ترقية الموارد (استنباطية → مؤشّرة)", level: "متوسط–عال", intensity: 60 },
+    ] },
+    exit: { header: "استراتيجيات الخروج", subtitle: "ثلاثة مسارات لتحقيق القيمة", returnLabel: "العائد المتوقّع", items: [
+      { letter: "A", title: "التطوير والتشغيل", desc: "بناء المنجم، وإنتاج +200 ألف أونصة خلال 5–7 سنوات. يلتقط القيمة الكاملة لكنه الأعلى التزاماً رأسمالياً.", value: "+$128M" },
+      { letter: "B", title: "البيع بعد الـ PFS", desc: "إتمام المرحلة الثانية، وتأكيد الموارد المؤشّرة، وبيع الامتياز لمنتج كبير. أقل مخاطرة وأسرع عائد.", value: "$40–60M" },
+      { letter: "C", title: "مشروع مشترك", desc: "الشراكة مع منتج كبير للتطوير. الاحتفاظ بـ 30–40% من الأسهم، ومشاركة CAPEX. ملف مخاطر–عائد متوازن.", value: "$50–80M" },
+    ] },
+    partner: {
+      supra: "إطار المشروع المشترك",
+      titleA: "طريقان نحو",
+      titleB: "شراكة سيادية",
+      subtitle: "امتياز كارانغاسو للذهب · CAPEX تأشيري $50M",
+      optA: "الخيار أ · شركة تشغيل مشتركة",
+      optB: "الخيار ب · اتفاقية تقاسم الإنتاج",
+      termHeader: "البند",
+      optAFull: "الخيار أ · شركة تشغيل مشتركة",
+      optBFull: "الخيار ب · اتفاقية تقاسم الإنتاج",
+      pathHeader: "مسار التنفيذ",
+      retainedLabel: "السيادة المُحتفظ بها",
+      retainedBodyPre: "في إطار ",
+      retainedBodyAll: "كل تكوينات الشراكة",
+      retainedBodyMid: "، تحتفظ مجموعة كانغالا القابضة بـ",
+      retainedBodyAsset: "100% من ملكية شركة الأصول",
+      retainedBodyEnd: " لكل الحقوق المعدنية. الأصل السيادي غير قابل للتمييع أبداً.",
+      options: [
+        { badge: "الخيار أ", title: "شراكة تشغيلية", subtitle: "شركة تشغيل مشتركة · حصص قابلة للتفاوض", bullets: [
+          "شركة تشغيل مشتركة الملكية مع توزيع حصص قابل للتفاوض",
+          "تحتفظ كانغالا بـ 100% من ملكية شركة الأصول وكل الحقوق المعدنية",
+          "حوكمة تشغيلية مشتركة عبر تمثيل في المجلس المشترك",
+          "توزيع الأرباح وفق اتفاقية الشراكة",
+          "التزامات إفصاح وشفافية كاملة بمعايير JORC",
+        ] },
+        { badge: "الخيار ب", title: "تقاسم الإنتاج (PSA)", subtitle: "استرداد سريع للتكاليف", bullets: [
+          "استرداد مُعجَّل للتكاليف مقابل مساهمة الشريك الرأسمالية",
+          "نموذج تقاسم الإنتاج بعد الاسترداد (70 / 30 تأشيري)",
+          "تحكم تشغيلي مباشر مع إشراف من كانغالا",
+          "تحتفظ كانغالا بـ 100% من ملكية شركة الأصول وكل الحقوق المعدنية",
+          "حوكمة عبر اللجنة الفنية مع مراجعة فصلية",
+        ] },
+      ],
+      terms: [
+        { k: "الهيكل", a: "شركة تشغيل مشتركة الملكية", b: "اتفاقية تقاسم إنتاج" },
+        { k: "توزيع الحصص", a: "قابل للتفاوض — وفق المساهمة", b: "غير متعلق — نموذج استرداد تكاليف" },
+        { k: "ملكية شركة الأصول", a: "100% كانغالا — سيادية محفوظة", b: "100% كانغالا — سيادية محفوظة" },
+        { k: "استرداد CAPEX", a: "مشترك بالتناسب", b: "استرداد سريع من الإنتاج" },
+        { k: "الحوكمة", a: "مجلس مشترك — تمثيل متكافئ", b: "لجنة فنية — مراجعة فصلية" },
+        { k: "توزيع الأرباح", a: "توزيعات وفق الاتفاقية", b: "تقاسم بعد الاسترداد (70/30 تأشيري)" },
+        { k: "الإفصاح", a: "JORC 2012 — معتمد لدى هيئة الأوراق المالية الإماراتية", b: "JORC 2012 — معتمد لدى هيئة الأوراق المالية الإماراتية" },
+      ],
+      flow: [
+        { num: "01", text: "اللجنة الفنية\nالمشتركة" },
+        { num: "02", text: "دراسة الجدوى\nالنهائية" },
+        { num: "03", text: "موافقة\nالمجلس" },
+        { num: "04", text: "الالتزام\nالمالي" },
+      ],
+    },
+    disclaimer: { title: "إخلاء مسؤولية مهم", bodyPre: "تستند دراسة الاستثمار هذه إلى ", bodyInf: "الموارد الاستنباطية", bodyMid: " (JORC 2012). تنطوي البيانات التطلعية على مخاطر وعدم يقين؛ وقد تختلف النتائج الفعلية اختلافاً جوهرياً. افتراض سعر الذهب: ", goldPrice: "$2,350 / أونصة", bodyMid2: ". نُمذجت OPEX عند ", aisc: "$1,200 / أونصة AISC", bodyEnd: ". جميع شروط الشراكة تأشيرية وخاضعة للاتفاق النهائي. لا تُشكّل هذه الوثيقة مشورة مالية. يُوصى بإجراء فحص نافٍ للجهالة مستقل." },
+  },
 };
 
 const LocCtx = createContext<Loc>(DICT.en);
@@ -268,7 +355,7 @@ function HeroROICountUp() {
     if (!inView) return;
     const c = animate(0, 2.3, {
       duration: 2.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE.HOVER,
       onUpdate(v) {
         setVal(v.toFixed(1));
       },
@@ -288,7 +375,7 @@ function HeroROICountUp() {
 // ═══════════════════════════════════════════════════════════════════
 
 export default function Investment({ lang = "en" }: SceneProps = {}) {
-  const t = useMemo(() => DICT[lang], [lang]);
+  const t = useMemo(() => DICT[lang ?? "en"], [lang]);
   return (
     <LocCtx.Provider value={t}>
     <section className="relative w-full bg-sovereign text-ivory overflow-hidden">
@@ -339,11 +426,11 @@ function InvestmentHeroAct() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="text-center mb-14 md:mb-16"
         >
           <div className="font-cinzel text-gold tracking-[0.55em] text-[10px] md:text-xs mb-3 opacity-90">
-            {t.hero.supra} · حالة الاستثمار
+            {t.hero.supra}
           </div>
           <h2 className="font-cinzel text-ivory tracking-[0.1em] text-3xl md:text-5xl lg:text-6xl font-light leading-tight">
             {t.hero.titleA}
@@ -360,7 +447,7 @@ function InvestmentHeroAct() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="relative mb-10 md:mb-14"
         >
           <div
@@ -371,11 +458,6 @@ function InvestmentHeroAct() {
               border: "1px solid rgba(184,149,74,0.45)",
             }}
           >
-            <span className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-gold" />
-            <span className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-gold" />
-            <span className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-gold" />
-            <span className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-gold" />
-
             <div className="font-cinzel text-gold/70 tracking-[0.4em] text-[10px] md:text-xs uppercase mb-2">
               {t.hero.baseReturn}
             </div>
@@ -416,7 +498,7 @@ function InvestmentHeroAct() {
               >
                 {m.val}
               </div>
-              <div className="mt-1.5 font-cinzel text-ivory/55 tracking-[0.2em] text-[9px] uppercase">
+              <div className="mt-1.5 font-cinzel text-ivory/55 tracking-[0.2em] text-[11px] uppercase">
                 {m.lbl}
               </div>
             </motion.div>
@@ -459,15 +541,10 @@ function ScenarioAct() {
           className="overflow-x-auto relative"
           style={{ border: "1px solid rgba(184,149,74,0.35)" }}
         >
-          <span className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-gold pointer-events-none" />
-          <span className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-gold pointer-events-none" />
-          <span className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-gold pointer-events-none" />
-          <span className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-gold pointer-events-none" />
-
           <table className="w-full min-w-[720px]">
             <thead>
               <tr
-                className="font-cinzel text-gold-bright tracking-[0.2em] text-[9px] md:text-[10px] uppercase"
+                className="font-cinzel text-gold-bright tracking-[0.2em] text-[10px] md:text-[11px] uppercase"
                 style={{
                   background: "rgba(184,149,74,0.08)",
                   borderBottom: "2px solid #B8954A",
@@ -611,7 +688,7 @@ function WaterfallRow({
           transition={{
             duration: 1.2,
             delay: 0.2 + index * 0.12,
-            ease: [0.22, 1, 0.36, 1],
+            ease: EASE.SNAP,
           }}
           className="h-full"
           style={{
@@ -700,7 +777,7 @@ function RiskRow({
 
       {/* Level pill */}
       <div
-        className="text-center px-3 py-1 font-cinzel tracking-[0.18em] text-[9px] md:text-[10px] uppercase font-semibold text-sovereign"
+        className="text-center px-3 py-1 font-cinzel tracking-[0.18em] text-[10px] md:text-[11px] uppercase font-semibold text-sovereign"
         style={{
           background: `rgba(184,149,74,${pillOpacity})`,
           border: "1px solid rgba(184,149,74,0.5)",
@@ -718,7 +795,7 @@ function RiskRow({
           transition={{
             duration: 1.1,
             delay: 0.2 + index * 0.08,
-            ease: [0.22, 1, 0.36, 1],
+            ease: EASE.SNAP,
           }}
           className="h-full"
           style={{
@@ -764,7 +841,7 @@ function ExitAct() {
               transition={{
                 duration: 0.8,
                 delay: i * 0.1,
-                ease: [0.22, 1, 0.36, 1],
+                ease: EASE.SPRING,
               }}
               className="relative p-5 md:p-6 flex flex-col"
               style={{
@@ -787,7 +864,7 @@ function ExitAct() {
                 {e.desc}
               </p>
               <div className="pt-3 border-t border-gold/15 flex items-baseline justify-between">
-                <span className="font-cinzel text-ivory/45 tracking-[0.25em] text-[9px] uppercase">
+                <span className="font-cinzel text-ivory/45 tracking-[0.25em] text-[11px] uppercase">
                   {t.exit.returnLabel}
                 </span>
                 <span className="font-cinzel text-gold-gradient text-lg md:text-xl font-light tabular-nums">
@@ -820,7 +897,7 @@ function PartnershipAct() {
           className="text-center mb-12 md:mb-16"
         >
           <div className="font-cinzel text-gold tracking-[0.5em] text-[10px] md:text-xs mb-3 opacity-90">
-            {t.partner.supra} · إطار الشراكة
+            {t.partner.supra}
           </div>
           <h2 className="font-cinzel text-ivory tracking-[0.08em] text-3xl md:text-4xl lg:text-5xl font-light leading-tight">
             {t.partner.titleA}
@@ -972,7 +1049,7 @@ function JvOptionCard({
       transition={{
         duration: 0.8,
         delay: index * 0.12,
-        ease: [0.22, 1, 0.36, 1],
+        ease: EASE.SPRING,
       }}
       className="relative p-6 md:p-7"
       style={{

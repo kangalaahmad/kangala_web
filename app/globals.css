@@ -345,3 +345,217 @@ html { font-display: swap; }
      → Invitation (Sovereign-Deep) ← final closing fade to the deep variant
                                      (ONLY place sovereign-deep appears)
    ═══════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   OPERATION CINEMATIC VAULT — PHASE 1 Atmospherics
+   ═══════════════════════════════════════════════════════════════════
+   Three CSS-only layers consumed by <CinematicAtmosphere />:
+     · .cinematic-vignette      — breathing edges (8s ease-in-out)
+     · .cinematic-godray--a     — diagonal shaft, 72s drift
+     · .cinematic-godray--b     — counter-diagonal shaft, 96s drift
+   All animations are transform/opacity only (GPU accelerated).
+   `prefers-reduced-motion` neutralizes every animation below.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Breathing Vignette ───
+   The edges of the screen gently inhale/exhale. Combined with a tiny
+   opacity dip, this adds depth without the viewer consciously noticing.
+   Scale 1.00 → 1.04 is imperceptible frame-by-frame but unmistakable
+   when watching for 30+ seconds. */
+@keyframes cinematic-vignette-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.88;
+  }
+}
+.cinematic-vignette {
+  transform-origin: 50% 42%;
+  animation: cinematic-vignette-breathe 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* ─── God Rays (Cathedral / Vault Light) ───
+   Two oversized diagonal gradient bands drift slowly across the viewport.
+   The gradient stops create soft edges natively (no blur filter needed
+   → zero mobile jank). Opacity 3-4% gold keeps them whisper-subtle.
+
+   Width is 180vw/160vw so even when translated ±15vw we never see the
+   hard edge. Height 220vh to survive any viewport aspect ratio.
+
+   Rotation is baked into the base transform; animation only translates,
+   so the GPU composites without recomputing layout. */
+.cinematic-godray {
+  position: absolute;
+  top: -60vh;
+  left: -40vw;
+  width: 180vw;
+  height: 220vh;
+  pointer-events: none;
+  will-change: transform;
+}
+.cinematic-godray--a {
+  background: linear-gradient(
+    90deg,
+    transparent 44%,
+    rgba(212, 175, 90, 0.045) 50%,
+    transparent 56%
+  );
+  transform: rotate(22deg) translateX(-14vw);
+  animation: cinematic-godray-drift-a 72s ease-in-out infinite alternate;
+}
+.cinematic-godray--b {
+  background: linear-gradient(
+    90deg,
+    transparent 46%,
+    rgba(212, 175, 90, 0.035) 50%,
+    transparent 54%
+  );
+  transform: rotate(-18deg) translateX(12vw);
+  animation: cinematic-godray-drift-b 96s ease-in-out infinite alternate;
+}
+@keyframes cinematic-godray-drift-a {
+  from { transform: rotate(22deg)  translateX(-14vw); }
+  to   { transform: rotate(22deg)  translateX(14vw); }
+}
+@keyframes cinematic-godray-drift-b {
+  from { transform: rotate(-18deg) translateX(12vw); }
+  to   { transform: rotate(-18deg) translateX(-12vw); }
+}
+
+/* ─── Accessibility & battery guard ───
+   Users who request reduced motion get a completely still atmosphere:
+   vignette, spotlight, grain, and top-bleed remain (they are valuable
+   static lighting), but nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-vignette,
+  .cinematic-godray,
+  .cinematic-godray--a,
+  .cinematic-godray--b {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   OPERATION CINEMATIC VAULT — PHASE 2
+   ═══════════════════════════════════════════════════════════════════
+   Physical motion anchored in reality:
+     · .ken-burns--a / .ken-burns--b  — slow zoom+pan (documentary film)
+     · .medal-shimmer                 — Rolex-physics light sweep
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Ken Burns ───
+   Documentary film technique: slow imperceptible zoom + drift on raster
+   images over ~22s, looping via `alternate` so it never snaps back.
+
+   Two variants with different pan vectors so side-by-side images don't
+   move in unison (which would look mechanical). Variant --a drifts
+   up-left, --b drifts down-right.
+
+   Applied to `<Image />` with `fill` — must sit on an element that can
+   transform (Next.js Image with fill is absolutely positioned inside a
+   relative parent, so transform works natively).
+
+   Zoom range 1.00 → 1.06 is the sweet spot: visible when watching for
+   15+ seconds, invisible at a glance. More than 1.08 starts looking
+   like a hover state. */
+@keyframes ken-burns-a {
+  from {
+    transform: scale(1.00) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.06) translate3d(-1.2%, -1.5%, 0);
+  }
+}
+@keyframes ken-burns-b {
+  from {
+    transform: scale(1.00) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.06) translate3d(1.4%, 1%, 0);
+  }
+}
+.ken-burns--a {
+  animation: ken-burns-a 22s ease-in-out infinite alternate;
+  transform-origin: 55% 45%;
+  will-change: transform;
+}
+.ken-burns--b {
+  animation: ken-burns-b 26s ease-in-out infinite alternate;
+  transform-origin: 45% 55%;
+  will-change: transform;
+}
+
+/* ─── Medal Shimmer (Rolex-physics light sweep) ───
+   A diagonal highlight band sweeps across the medal image every ~15s.
+   NOT a particle effect — this is a physically accurate reflection of
+   light moving across a curved metallic surface, exactly how luxury
+   watches and precious metals are photographed in editorial work.
+
+   Timing design (18s cycle):
+     0–12%  : sweep enters from top-left, crosses medal, exits bottom-right (~2.2s visible)
+     12–100%: nothing happens (~15.8s rest — keeps it dignified, not twitchy)
+
+   The shimmer container is transparent and overflow-hidden. The ::before
+   pseudo-element is the actual highlight, positioned at 25deg diagonal. */
+@keyframes medal-shimmer-sweep {
+  0% {
+    transform: translateX(-140%) rotate(25deg);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.9;
+  }
+  12% {
+    transform: translateX(220%) rotate(25deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(220%) rotate(25deg);
+    opacity: 0;
+  }
+}
+.medal-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 3;
+  /* keep the shimmer inside any inner soft-frame border */
+  border-radius: inherit;
+}
+.medal-shimmer::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: 0;
+  width: 45%;
+  height: 160%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 248, 220, 0) 30%,
+    rgba(255, 248, 220, 0.28) 50%,
+    rgba(255, 248, 220, 0) 70%,
+    transparent 100%
+  );
+  transform: translateX(-140%) rotate(25deg);
+  animation: medal-shimmer-sweep 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+/* Stagger the Burkina medal so both medals never shimmer simultaneously */
+.medal-shimmer--delayed::before {
+  animation-delay: 9s;
+}
+
+/* ─── PHASE 2 accessibility guard ─── */
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns--a,
+  .ken-burns--b,
+  .medal-shimmer::before {
+    animation: none !important;
+  }
+}

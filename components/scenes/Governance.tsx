@@ -37,7 +37,9 @@
 
 import { motion } from "framer-motion";
 import { createContext, useContext } from "react";
-import type { SceneProps, Lang } from "@/lib/i18n";
+import type { SceneProps, FullDict } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
+import SovereignSignature from "@/components/SovereignSignature";
 
 // ═══════════════════════════════════════════════════════════════════
 // Data
@@ -272,12 +274,12 @@ type Loc = {
   closing: { quote: string; note: string };
 };
 
-const DICT: Record<Lang, Loc> = {
+const DICT: FullDict<Loc> = {
   en: {
-    act1: { pre: "TRUST FRAMEWORK · حوكمة سيادية", title: "GOVERNANCE", highlight: "MODEL", sub: "Checks, balances, and aligned incentives for sustainable value creation", flowLbl: "Decision Flow", principlesLbl: "Core Principles" },
+    act1: { pre: "TRUST FRAMEWORK", title: "GOVERNANCE", highlight: "MODEL", sub: "Checks, balances, and aligned incentives for sustainable value creation", flowLbl: "Decision Flow", principlesLbl: "Core Principles" },
     act2: { pre: "Board & Committees", title: "OVERSIGHT", highlight: "STRUCTURE", sub: "Strategic direction, risk management, and transparent governance", committeesTitle: "Committees & Mandates", matrixTitle: "Decision Authority Matrix", colCommittee: "Committee", colComposition: "Composition", colMandate: "Mandate", colFreq: "Freq." },
     act3: { pre: "Responsible Stewardship", title: "ESG", highlight: "FRAMEWORK", sub: "Sustainable development, community value, and responsible stewardship" },
-    act4: { pre: "Dispute Resolution · الآلية القانونية", title: "ARBITRATION", highlight: "LADDER", sub: "Clear, fair, and internationally recognized mechanisms", legalTitle: "Legal Framework" },
+    act4: { pre: "Dispute Resolution", title: "ARBITRATION", highlight: "LADDER", sub: "Clear, fair, and internationally recognized mechanisms", legalTitle: "Legal Framework" },
     decisionFlow: DECISION_FLOW,
     principles: CORE_PRINCIPLES,
     orgChain: ORG_CHAIN,
@@ -294,10 +296,10 @@ const DICT: Record<Lang, Loc> = {
     },
   },
   fr: {
-    act1: { pre: "CADRE DE CONFIANCE · حوكمة سيادية", title: "MODÈLE DE", highlight: "GOUVERNANCE", sub: "Contrôles, équilibres et incitations alignées pour une création de valeur durable", flowLbl: "Processus Décisionnel", principlesLbl: "Principes Fondamentaux" },
+    act1: { pre: "CADRE DE CONFIANCE", title: "MODÈLE DE", highlight: "GOUVERNANCE", sub: "Contrôles, équilibres et incitations alignées pour une création de valeur durable", flowLbl: "Processus Décisionnel", principlesLbl: "Principes Fondamentaux" },
     act2: { pre: "Conseil & Comités", title: "STRUCTURE DE", highlight: "SUPERVISION", sub: "Direction stratégique, gestion des risques et gouvernance transparente", committeesTitle: "Comités & Mandats", matrixTitle: "Matrice d'Autorité Décisionnelle", colCommittee: "Comité", colComposition: "Composition", colMandate: "Mandat", colFreq: "Fréq." },
     act3: { pre: "Gestion Responsable", title: "CADRE", highlight: "ESG", sub: "Développement durable, valeur communautaire et gestion responsable" },
-    act4: { pre: "Résolution des Litiges · الآلية القانونية", title: "ÉCHELLE", highlight: "D'ARBITRAGE", sub: "Mécanismes clairs, équitables et internationalement reconnus", legalTitle: "Droit Applicable" },
+    act4: { pre: "Résolution des Litiges", title: "ÉCHELLE", highlight: "D'ARBITRAGE", sub: "Mécanismes clairs, équitables et internationalement reconnus", legalTitle: "Droit Applicable" },
     decisionFlow: [
       { num: "01", title: "Proposition", desc: "L'une des parties initie un nouveau chantier, une demande budgétaire ou un programme technique via le Bureau Technique Conjoint.", owner: "Kangala ou Partenaire" },
       { num: "02", title: "Revue Technique", desc: "Le Bureau Technique Conjoint évalue la faisabilité, les risques et l'alignement stratégique. Les deux parties participent à l'évaluation.", owner: "Comité Technique" },
@@ -385,6 +387,98 @@ const DICT: Record<Lang, Loc> = {
       note: "Cadre de gouvernance soumis à l'accord de partenariat final. Tous les mécanismes protègent les intérêts des deux parties selon des normes internationalement reconnues.",
     },
   },
+  ar: {
+    act1: { pre: "إطار الثقة", title: "نموذج", highlight: "الحوكمة", sub: "ضوابط وتوازنات وحوافز متوافقة لخلق قيمة مستدامة", flowLbl: "مسار اتخاذ القرار", principlesLbl: "المبادئ الجوهرية" },
+    act2: { pre: "المجلس واللجان", title: "هيكل", highlight: "الإشراف", sub: "توجيه استراتيجي وإدارة مخاطر وحوكمة شفّافة", committeesTitle: "اللجان والتفويضات", matrixTitle: "مصفوفة صلاحيات اتخاذ القرار", colCommittee: "اللجنة", colComposition: "التشكيل", colMandate: "التفويض", colFreq: "التواتر" },
+    act3: { pre: "الإدارة المسؤولة", title: "إطار", highlight: "ESG", sub: "تنمية مستدامة، وقيمة مجتمعية، وإدارة مسؤولة" },
+    act4: { pre: "تسوية النزاعات", title: "سلّم", highlight: "التحكيم", sub: "آليات واضحة ومنصفة ومعترف بها دولياً", legalTitle: "الإطار القانوني" },
+    decisionFlow: [
+      { num: "01", title: "المقترح", desc: "يبادر أي طرف بإطلاق مسار عمل جديد أو طلب ميزانية أو برنامج فني عبر المكتب الفني المشترك.", owner: "كانغالا أو الشريك" },
+      { num: "02", title: "المراجعة الفنية", desc: "يقيّم المكتب الفني المشترك الجدوى والمخاطر والتوافق الاستراتيجي. يشارك الطرفان في التقييم.", owner: "اللجنة الفنية" },
+      { num: "03", title: "الموافقة المالية", desc: "تراجع لجنة المالية أثر الميزانية والتدفقات النقدية. توقيع مزدوج مطلوب للمصروفات التي تتجاوز $100K.", owner: "لجنة المالية" },
+      { num: "04", title: "تصديق المجلس", desc: "يمنح المجلس المشترك الموافقة النهائية على القرارات الجوهرية. يضمن الرئيس المستقل مداولات متوازنة.", owner: "المجلس المشترك" },
+      { num: "05", title: "التنفيذ", desc: "تنفّذ إدارة المشروع المشترك البرنامج الموافق عليه وفق مؤشرات أداء وجدول زمني ومعالم إفصاح.", owner: "إدارة المشروع" },
+    ],
+    principles: [
+      { n: "1", title: "الشفافية", desc: "تُتاح البيانات المالية والتشغيلية والفنية للشريكين على قدم المساواة عبر بوابة آمنة بالوصول الفوري." },
+      { n: "2", title: "المساءلة", desc: "مسؤولية واضحة في كل مرحلة من اتخاذ القرار، مع توثيق الموافقات ومسارات التدقيق ومراجعات الأداء الفصلية." },
+      { n: "3", title: "حوافز متوافقة", desc: "بنية مخاطر–عائد مشتركة تضمن استفادة الطرفين من نجاح المشروع وتحمّلهما تبعات تدني الأداء." },
+      { n: "4", title: "تنفيذ سريع", desc: "صلاحية مفوّضة للقرارات التشغيلية تُزيل الاختناقات. تُرفع فقط القرارات الجوهرية إلى المجلس." },
+    ],
+    orgChain: [
+      { label: "المجلس المشترك", sub: "التوجيه الاستراتيجي", primary: true },
+      { label: "التدقيق والمخاطر", sub: "الامتثال والضوابط" },
+      { label: "اللجنة الفنية", sub: "العمليات والبرامج" },
+      { label: "لجنة ESG", sub: "الاستدامة والأثر" },
+      { label: "إدارة المشروع", sub: "التنفيذ اليومي", primary: true },
+    ],
+    committees: [
+      { name: "المجلس المشترك", comp: "3 كانغالا + 3 شريك + رئيس مستقل", mandate: "الاستراتيجية، وموافقة الميزانية، والقرارات الكبرى", freq: "فصلية" },
+      { name: "التدقيق والمخاطر", comp: "2 كانغالا + 2 شريك + مدقّق خارجي", mandate: "الضوابط المالية، والامتثال، وسجل المخاطر", freq: "فصلية" },
+      { name: "اللجنة الفنية", comp: "2 كانغالا + 2 جيولوجيون ومهندسون من الشريك", mandate: "الاستكشاف، والحفر، وتخطيط المنجم", freq: "شهرية" },
+      { name: "لجنة ESG", comp: "1 كانغالا + 1 شريك + ممثل مجتمعي", mandate: "البيئة، والأثر الاجتماعي، والمحتوى المحلي", freq: "نصف سنوية" },
+      { name: "لجنة المالية", comp: "المديران الماليان للطرفين", mandate: "التدفقات النقدية، وسحب CAPEX، والتوزيعات", freq: "شهرية" },
+    ],
+    authority: [
+      { key: "موافقة الميزانية السنوية", val: "المجلس المشترك" },
+      { key: "CAPEX > $500K", val: "المجلس المشترك" },
+      { key: "CAPEX $100K – $500K", val: "لجنة المالية" },
+      { key: "تعديلات برنامج الاستكشاف", val: "اللجنة الفنية" },
+      { key: "استثمار مجتمعي > $50K", val: "لجنة ESG" },
+      { key: "البيانات المالية الفصلية", val: "التدقيق والمخاطر" },
+      { key: "العمليات اليومية", val: "إدارة المشروع" },
+    ],
+    esgPillars: [
+      { letter: "E", title: "البيئة", accent: "#1A3A2A", items: [
+        { k: "إدارة المياه", v: "إعادة تدوير بدائرة مغلقة لتقليل استهلاك المياه العذبة" },
+        { k: "التنوّع البيولوجي", v: "مسوح مرجعية قبل التعدين، وإعادة تأهيل تدريجية" },
+        { k: "الانبعاثات", v: "توليد شمسي هجين بهدف تخفيض 40% من الكربون" },
+        { k: "النفايات", v: "إدارة نفايات التعدين وفق معيار ICMM العالمي للصناعة" },
+      ]},
+      { letter: "S", title: "الاجتماع", accent: "#7A1F1F", items: [
+        { k: "التوظيف المحلي", v: "أكثر من  80% من القوى العاملة من الهو باسان والمناطق المحيطة" },
+        { k: "الصحة والتعليم", v: "عيادة مجتمعية ومركز تدريب مهني في كارانغاسو" },
+        { k: "السلامة", v: "هدف صفر أذى بمنظومة إدارة ISO 45001" },
+        { k: "العمل العادل", v: "أجر معيشي؛ وسياسة عدم تشغيل الأطفال والعمل القسري" },
+      ]},
+      { letter: "G", title: "الحوكمة", accent: "#B8954A", items: [
+        { k: "مكافحة الفساد", v: "امتثال كامل لقوانين الإمارات لمكافحة غسيل الأموال والفساد والمعايير الدولية" },
+        { k: "شفافية EITI", v: "إفصاح علني عن جميع المدفوعات للجهات الحكومية" },
+        { k: "إشراف المجلس", v: "لجنة ESG مستقلة مع تقارير ربع سنوية" },
+        { k: "الإبلاغ عن المخالفات", v: "قناة بلاغ مجهولة مع تحقيق مستقل" },
+      ]},
+    ],
+    esgTargets: [
+      { val: "+80%", lbl: "العمالة المحلية" },
+      { val: "40%", lbl: "تخفيض الكربون" },
+      { val: "صفر", lbl: "هدف الأذى" },
+      { val: "ISO", lbl: "معتمد 45001" },
+      { val: "EITI", lbl: "امتثال كامل" },
+    ],
+    disputeTiers: [
+      { step: "1", title: "تفاوض مباشر", timeline: "0 – 30 يوماً", desc: "تفاوض مباشر بين ممثلين أول من الطرفين مفوضين. محادثات بحسن نية لحل المسائل ودياً والحفاظ على العلاقة التجارية.", meta: [ { k: "المستوى", v: "الرئيس التنفيذي / المدير العام" }, { k: "المنصّة", v: "دبي أو واغادوغو" } ] },
+      { step: "2", title: "وساطة", timeline: "30 – 90 يوماً", desc: "الاستعانة بوسيط محايد يُعيّن بالتراضي. عملية تيسير غير ملزمة لالتماس تسوية مقبولة للطرفين.", meta: [ { k: "المؤسسة", v: "وساطة LCIA / DIAC" }, { k: "المقر", v: "دبي، الإمارات" } ] },
+      { step: "3", title: "تحكيم ملزم", timeline: "90 – 365 يوماً", desc: "تحكيم نهائي وملزم وفق القواعد الدولية. الحكم قابل للتنفيذ في أكثر من 170 دولة.", meta: [ { k: "القواعد", v: "UNCITRAL / LCIA" }, { k: "المحكمون", v: "هيئة ثلاثية" }, { k: "اللغة", v: "الإنجليزية (رئيسية)" } ] },
+    ],
+    legal: [
+      { k: "القانون الحاكم", v: "القانون الموحّد لـ OHADA وقانون التعدين البوركيني 2015" },
+      { k: "مقر التحكيم", v: "مركز دبي المالي العالمي (DIFC)" },
+      { k: "المؤسسة التحكيمية", v: "مركز دبي للتحكيم الدولي (DIAC)" },
+      { k: "اللغة", v: "الإنجليزية والفرنسية (إجراءات مزدوجة)" },
+      { k: "الهيئة", v: "ثلاثة محكّمين — واحد لكل طرف والثالث يعيّنه DIAC" },
+      { k: "التنفيذ", v: "دولي — أكثر من 170 دولة موقّعة" },
+      { k: "التدابير المؤقتة", v: "محكّم طوارئ خلال 15 يوماً" },
+      { k: "السرية", v: "جميع الإجراءات سرية تماماً" },
+    ],
+    protections: [
+      { title: "حماية المستثمرين", desc: "حمايات اتفاقية الاستثمار الثنائية الإماراتية–البوركينية مطبّقة." },
+      { title: "الضمان السيادي", desc: "اتفاقية التعدين تضمن استقرار الشروط المالية." },
+    ],
+    closing: {
+      quote: "«الحوكمة الفاعلة توائم الحوافز، وتُسرّع التنفيذ، وتضمن الشفافية في كل مرحلة من الشراكة.»",
+      note: "إطار الحوكمة خاضع لاتفاقية الشراكة النهائية. جميع الآليات تحمي مصالح الطرفين وفق معايير دولية معترف بها.",
+    },
+  },
 };
 
 const LocCtx = createContext<Loc>(DICT.en);
@@ -425,7 +519,7 @@ function ActHeader({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 1, ease: EASE.DISSOLVE }}
       className="mb-10 md:mb-14"
     >
       <div className="font-cinzel text-gold tracking-[0.5em] text-[10px] md:text-xs mb-3 uppercase opacity-90">
@@ -458,7 +552,7 @@ function ActHeader({
 
 export default function Governance({ lang = "en" }: SceneProps = {}) {
   return (
-    <LocCtx.Provider value={DICT[lang]}>
+    <LocCtx.Provider value={DICT[lang ?? "en"]}>
     <section className="relative w-full bg-ivory text-sovereign overflow-hidden">
       {/* Akan diagonal watermark */}
       <div
@@ -484,6 +578,9 @@ export default function Governance({ lang = "en" }: SceneProps = {}) {
       <EsgAct />
       <DisputeAct />
       <ClosingDoctrine />
+
+      {/* ═══ Sovereign Signature — live treaty-signing mark ═══ */}
+      <SovereignSignature />
 
       {/* Bottom handshake */}
       <div
@@ -529,7 +626,7 @@ function GovernanceAct() {
                 transition={{
                   duration: 0.7,
                   delay: i * 0.08,
-                  ease: [0.22, 1, 0.36, 1],
+                  ease: EASE.SPRING,
                 }}
                 className="relative p-4 md:p-5 flex flex-col"
                 style={{
@@ -551,7 +648,7 @@ function GovernanceAct() {
                 <div className="font-cormorant text-sovereign/80 text-[13px] md:text-sm leading-relaxed flex-1 mb-3">
                   {step.desc}
                 </div>
-                <div className="font-cinzel text-ivory text-[9px] tracking-[0.15em] uppercase px-2 py-1 bg-gold self-start">
+                <div className="font-cinzel text-ivory text-[11px] tracking-[0.15em] uppercase px-2 py-1 bg-gold self-start">
                   {step.owner}
                 </div>
               </motion.div>
@@ -634,7 +731,7 @@ function BoardAct() {
                     {node.label}
                   </div>
                   <div
-                    className={`mt-1 font-cinzel text-[9px] md:text-[10px] tracking-[0.15em] uppercase ${
+                    className={`mt-1 font-cinzel text-[10px] md:text-[11px] tracking-[0.15em] uppercase ${
                       node.primary ? "text-gold" : "text-sovereign/60"
                     }`}
                   >
@@ -657,7 +754,7 @@ function BoardAct() {
             <table className="w-full text-left">
               <thead>
                 <tr
-                  className="font-cinzel text-ivory tracking-[0.2em] text-[9px] uppercase"
+                  className="font-cinzel text-ivory tracking-[0.2em] text-[10px] md:text-[11px] uppercase"
                   style={{ background: "#0A192F", borderBottom: "3px solid #B8954A" }}
                 >
                   <th className="px-3 md:px-4 py-2.5">{t.act2.colCommittee}</th>
@@ -769,7 +866,7 @@ function EsgAct() {
               transition={{
                 duration: 0.8,
                 delay: i * 0.12,
-                ease: [0.22, 1, 0.36, 1],
+                ease: EASE.SPRING,
               }}
               className="flex flex-col overflow-hidden"
               style={{
@@ -835,7 +932,7 @@ function EsgAct() {
               <div className="font-cinzel text-gold text-2xl md:text-3xl font-light">
                 {item.val}
               </div>
-              <div className="mt-1.5 font-cinzel text-ivory/60 tracking-[0.2em] text-[9px] uppercase">
+              <div className="mt-1.5 font-cinzel text-ivory/60 tracking-[0.2em] text-[11px] uppercase">
                 {item.lbl}
               </div>
             </div>
@@ -891,7 +988,7 @@ function DisputeAct() {
                   <div className="font-cinzel text-sovereign tracking-[0.2em] text-[12px] md:text-sm font-semibold uppercase leading-tight">
                     {tier.title}
                   </div>
-                  <div className="font-cinzel text-gold/80 tracking-[0.2em] text-[9px] uppercase mt-0.5">
+                  <div className="font-cinzel text-gold/80 tracking-[0.2em] text-[11px] uppercase mt-0.5">
                     {tier.timeline}
                   </div>
                 </div>

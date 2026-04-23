@@ -21,6 +21,7 @@ import type { ReactNode } from "react";
 import GateForm from "@/components/GateForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { Lang } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
 type Props = {
   isAuthed: boolean;
@@ -40,7 +41,7 @@ export default function AuthShell({ isAuthed, lang = "en", children }: Props) {
           key="content"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, ease: EASE.HOVER }}
         >
           <LanguageSwitcher current={lang} />
           {children}

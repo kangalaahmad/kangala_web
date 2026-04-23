@@ -20,30 +20,48 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import SovereignMap from "./SovereignMap";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
 
-const DICT: Dict<{
+const DICT: FullDict<{
   supra: string;
+  headlineA: string;
+  headlineB: string;
+  body: string;
   concessionLabel: string;
   areaLabel: string;
   scrollReveal: string;
 }> = {
   en: {
-    supra: "THE LAND · BIRIMIAN BELT",
-    concessionLabel: "Concession · 11.4503°N, 3.0112°W",
+    supra: "THE LAND \u00b7 BIRIMIAN BELT",
+    headlineA: "THE BIRIMIAN",
+    headlineB: "BELT",
+    body: "Heart of the Green Birimian Belt. Ninety-four confirmed gold anomalies via Deep-Explor\u00ae survey, with high-priority targets where Saprolite deposits begin at just 5 metres depth.",
+    concessionLabel: "Concession \u00b7 11.4503\u00b0N, 3.0112\u00b0W",
     areaLabel: "Area:",
     scrollReveal: "SCROLL TO REVEAL",
   },
   fr: {
-    supra: "LA TERRE · CEINTURE BIRIMIENNE",
-    concessionLabel: "Concession · 11,4503°N, 3,0112°O",
-    areaLabel: "Superficie :",
-    scrollReveal: "DÉFILER POUR RÉVÉLER",
+    supra: "LA TERRE \u00b7 CEINTURE BIRIMIENNE",
+    headlineA: "LA CEINTURE",
+    headlineB: "BIRIMIENNE",
+    body: "C\u0153ur de la Ceinture Birimienne Verte. Quatre-vingt-quatorze anomalies auriF\u00e8res confirm\u00e9es via sondage Deep-Explor\u00ae, avec des cibles prioritaires o\u00f9 les d\u00e9p\u00f4ts de Saprolite d\u00e9butent \u00e0 seulement 5 m\u00e8tres de profondeur.",
+    concessionLabel: "Concession \u00b7 11,4503\u00b0N, 3,0112\u00b0O",
+    areaLabel: "Superficie :",
+    scrollReveal: "D\u00c9FILER POUR R\u00c9V\u00c9LER",
+  },
+  ar: {
+    supra: "الأرض · الحزام البيريمي",
+    headlineA: "الحزام",
+    headlineB: "البيريمي",
+    body: "قلب الحزام البيريمي الأخضر. أربع وتسعون شاذّة ذهبية مؤكّدة عبر مسح Deep-Explor®، مع أهداف ذات أولوية عالية حيث تبدأ رواسب السابروليت عند عمق لا يتجاوز 5 أمتار فقط.",
+    concessionLabel: "الامتياز · 11.4503°ش ، 3.0112°غ",
+    areaLabel: "المساحة:",
+    scrollReveal: "مرّر للكشف",
   },
 };
 
 export default function TheLand({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -93,9 +111,10 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
                 {t.supra}
               </div>
 
-              <h2 className="font-cairo display-lg font-light text-ivory leading-[1.15] tracking-tight">
-                الحزام
-                <span className="text-gold-gradient font-normal"> البريمي</span>
+              <h2 className="font-cinzel display-lg font-light text-ivory leading-[1.15] tracking-tight">
+                {t.headlineA}
+                <br />
+                <span className="text-gold-gradient font-normal">{t.headlineB}</span>
               </h2>
 
               <div className="mt-8 mb-8 flex items-center gap-4 text-gold/50">
@@ -104,12 +123,8 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
                 <div className="w-8 h-px bg-gold/20" />
               </div>
 
-              <p className="font-cairo text-ivory/70 text-base md:text-lg leading-relaxed max-w-xl">
-                قلبُ الحزام البريمي الأخضر.
-                <br />
-                <span className="text-ivory/85">أربعةٌ وتسعون شذوذاً ذهبياً مُؤكَّداً</span>{" "}
-                عبر مسح Deep-Explor®، بأهداف أولوية عالية
-                تبدأ رواسب الـ Saprolite فيها من عمق 5 أمتار فقط.
+              <p className="font-inter text-ivory/70 text-base md:text-lg leading-relaxed max-w-xl">
+                {t.body}
               </p>
 
               <div className="mt-12 inline-block relative">
@@ -117,18 +132,12 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
                 <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-gold/60" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-gold/60" />
                 <div className="border border-gold/20 bg-sovereign-deep/30 px-7 py-5 backdrop-blur-sm">
-                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[9px] uppercase mb-2">
+                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[11px] uppercase mb-2">
                     {t.concessionLabel}
                   </div>
-                  <div
-                    className="font-cairo text-ivory text-xl md:text-2xl font-light tabular-nums"
-                    dir="rtl"
-                  >
-                    المساحة:{" "}
-                    <span className="text-gold font-normal" dir="ltr">
-                      40
-                    </span>{" "}
-                    km²
+                  <div className="font-cinzel text-ivory text-xl md:text-2xl font-light tabular-nums">
+                    <span className="text-gold/70 text-[11px] tracking-[0.3em] uppercase block mb-1">{t.areaLabel}</span>
+                    40 km²
                   </div>
                 </div>
               </div>
@@ -161,7 +170,7 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[9px] tracking-[0.5em] pointer-events-none">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[11px] tracking-[0.5em] pointer-events-none">
           {t.scrollReveal}
         </div>
       </div>

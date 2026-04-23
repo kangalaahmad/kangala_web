@@ -1,53 +1,75 @@
 /**
  * ╔═══════════════════════════════════════════════════════════════════╗
- * ║  i18n — Lightweight locale system for Kangala Web                  ║
+ * ║  i18n — Trilingual locale system for Kangala Web                   ║
  * ╠═══════════════════════════════════════════════════════════════════╣
  * ║                                                                    ║
- * ║  Supports two locales: English (default) and French.               ║
- * ║  Arabic text remains in-place inside scenes as a ceremonial        ║
- * ║  parallel layer (bilingual storytelling), independent of locale.   ║
+ * ║  Supports three fully-switchable locales: EN · FR · AR.            ║
+ * ║                                                                    ║
+ * ║  Two dict types:                                                   ║
+ * ║    Dict<T>     — Record<BaseLang, T>  → requires en + fr           ║
+ * ║    FullDict<T> — Record<Lang, T>      → requires en + fr + ar      ║
  * ║                                                                    ║
  * ║  Pattern used in scenes:                                           ║
  * ║                                                                    ║
- * ║    type Props = { lang?: Lang };                                   ║
- * ║    const DICT: Dict<{ title: string; sub: string }> = {            ║
- * ║      en: { title: "Our Vision", sub: "..." },                      ║
- * ║      fr: { titre: "Notre Vision", sub: "..." },                    ║
- * ║    };                                                              ║
- * ║    export default function Scene({ lang = "en" }: Props) {         ║
- * ║      const t = DICT[lang];                                         ║
- * ║      return <h1>{t.title}</h1>;                                    ║
- * ║    }                                                               ║
+ * ║    // 2-lang scene (AR falls back to EN via resolveLang):          ║
+ * ║    const DICT: Dict<{ title: string }> = { en: {...}, fr: {...} }; ║
+ * ║    const t = DICT[resolveLang(lang)];                              ║
+ * ║                                                                    ║
+ * ║    // 3-lang scene (explicit AR content):                          ║
+ * ║    const DICT: FullDict<{ title: string }> = {                     ║
+ * ║      en: {...}, fr: {...}, ar: {...} };                            ║
+ * ║    const t = DICT[lang ?? "en"];                                   ║
  * ║                                                                    ║
  * ╚═══════════════════════════════════════════════════════════════════╝
  */
 
-export const LOCALES = ["en", "fr"] as const;
+export const LOCALES = ["en", "fr", "ar"] as const;
 export type Lang = (typeof LOCALES)[number];
 
-export const DEFAULT_LANG: Lang = "en";
+/** Base locales — used by Dict (2-lang scenes). */
+export type BaseLang = "en" | "fr";
+
+export const DEFAULT_LANG: BaseLang = "en";
 
 export function isLang(value: string | undefined | null): value is Lang {
-  return value === "en" || value === "fr";
+  return value === "en" || value === "fr" || value === "ar";
 }
 
 /**
- * Typed dictionary helper. Use as:
- *   const DICT: Dict<MyShape> = { en: {...}, fr: {...} };
+ * Resolves any Lang to a BaseLang. Arabic falls back to English
+ * for scenes that do not provide explicit AR translations.
  */
-export type Dict<T> = Record<Lang, T>;
+export function resolveLang(lang?: Lang): BaseLang {
+  return lang === "ar" ? "en" : (lang ?? "en");
+}
+
+/**
+ * 2-lang dict (en + fr required). Use resolveLang() to access.
+ *   const DICT: Dict<MyShape> = { en: {...}, fr: {...} };
+ *   const t = DICT[resolveLang(lang)];
+ */
+export type Dict<T> = Record<BaseLang, T>;
+
+/**
+ * 3-lang dict (en + fr + ar required). AR-aware scenes use this.
+ *   const DICT: FullDict<MyShape> = { en: {...}, fr: {...}, ar: {...} };
+ *   const t = DICT[lang ?? "en"];
+ */
+export type FullDict<T> = Record<Lang, T>;
 
 /**
  * Human labels for the language switcher.
  */
-export const LANG_LABELS: Dict<string> = {
+export const LANG_LABELS: Record<Lang, string> = {
   en: "English",
   fr: "Français",
+  ar: "العربية",
 };
 
-export const LANG_SHORT: Dict<string> = {
+export const LANG_SHORT: Record<Lang, string> = {
   en: "EN",
   fr: "FR",
+  ar: "AR",
 };
 
 /**

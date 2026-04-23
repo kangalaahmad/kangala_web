@@ -8,7 +8,8 @@
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
 type Sample = { src: string; tray: string; horizon: string };
 type StatSimple = { value: string; label: string };
@@ -46,7 +47,7 @@ const SAMPLE_SRCS = [
   "/discovery/core_sample5.jpeg",
 ];
 
-const DICT: Dict<{
+const DICT: FullDict<{
   coreSupra: string;
   coreTitleA: string;
   coreTitleB: string;
@@ -249,6 +250,82 @@ const DICT: Dict<{
     validationMid: " — Réf. contrat : ",
     validationEnd: " Technologie de prospection NMRAI sur 40 km² de concession.",
   },
+  ar: {
+    coreSupra: "الاستكشاف والحفر",
+    coreTitleA: "عيّنات اللُبّ",
+    coreTitleB: "والدليل الحقلي",
+    coreSubtitle: "حفر لُبّ ماسي — نتائج الاستخراج الميداني",
+    coreNarrPre: "تكشف عينات اللُبّ المستخرجة من امتياز كانغالا عن ",
+    coreNarrStrong: "تشكيلات لاتيريت وسابروليت متعددة الأفق",
+    coreNarrEnd: " تظهر فيها طبقات أكاسيد الحديد وتعرقات مرو ونطاقات غنية بالكبريتيدات الحاملة للذهب. تمثّل كل صينية جريان حفر مستمرياً موثّقاً في الموقع قبل إرساله إلى مختبرات الفحص المعتمدة.",
+    coreSamples: [
+      { src: SAMPLE_SRCS[0], tray: "الصينية 1", horizon: "لاتيريت — الأفق المغربي" },
+      { src: SAMPLE_SRCS[1], tray: "الصينية 2", horizon: "سابروليت مختلط — نطاق مؤكسد" },
+      { src: SAMPLE_SRCS[2], tray: "الصينية 3", horizon: "لاتيريت حديدي" },
+      { src: SAMPLE_SRCS[3], tray: "الصينية 4", horizon: "سابروليت انتقالي" },
+      { src: SAMPLE_SRCS[4], tray: "الصينية 5", horizon: "لاتيريت عميق — لُبّ صلب" },
+    ],
+    drillStats: [
+      { value: "5", label: "صينيات موثّقة" },
+      { value: "NQ", label: "مقاس اللُبّ الماسي" },
+      { value: "+30م", label: "عمق الحفر المُنجز" },
+      { value: "100%", label: "معدل استرداد اللُبّ" },
+      { value: "3", label: "آفاق معدنية مُحدّدة" },
+    ],
+    explSupra: "تقرير الاستكشاف الجيولوجي",
+    explTitleA: "نظرة عامة",
+    explTitleB: "على الاستكشاف",
+    explSubtitle: "امتياز كارانغاسو · 94 شاذة ذهبية · تقنية Deep-Explor®",
+    explStats: [
+      { value: 94, display: "94", label: "شواذ ذهبية" },
+      { value: 69.38, display: "69.38", label: "أقصى CU (G-21)", decimals: 2 },
+      { value: 60279, display: "60٬279", label: "أكبر م٢ (G-22)" },
+      { value: 145.6, display: "145.6 م", label: "أقصى عمق", decimals: 1 },
+      { value: 40, display: "40 كم٢", label: "مساحة الامتياز" },
+      { value: 5.16, display: "5.16 م", label: "أدنى عمق", decimals: 2 },
+    ],
+    execSummaryLabel: "الملخّص التنفيذي",
+    geoSettingLabel: "الإطار الجيولوجي",
+    priorityLabel: "أهداف الحفر ذات الأولوية",
+    priorityTargets: [
+      { id: "G-22", m2: "60٬279 م٢", depth: "145.6 م" },
+      { id: "G-6", m2: "65.69 CU", depth: "110.2 م" },
+      { id: "G-10", m2: "41٬981 م٢", depth: "81.9 م" },
+      { id: "G-23", m2: "40٬795 م٢", depth: "133.4 م" },
+      { id: "G-19", m2: "34٬590 م٢", depth: "111.9 م" },
+    ],
+    validatedBy: "معتمد من",
+    execSummary1Pre: "",
+    execSummary1Company: "Deep Leader Innovation Intelligence Technology Co., Ltd",
+    execSummary1Mid1: " نفّذت حملة استكشاف شاملة للذهب في ",
+    execSummary1Area: "منطقة كارانغاسو، بوركينا فاسو",
+    execSummary1Mid2: " باستخدام تقنية الكشف عن المجال تحت الذري ",
+    execSummary1Tech: "Deep-Explor®",
+    execSummary1Mid3: " عبر الاستشعار عن بُعد بالأقمار الاصطناعية، وغطّت ",
+    execSummary1Km2: "40 كم٢",
+    execSummary1Mid4: " وحدّدت ",
+    execSummary1Anom: "94 نطاق شاذة ذهبية",
+    execSummary1End: " (من G-1 إلى G-94) على أعماق تتراوح بين 5 و 145.6 متراً.",
+    execSummary2Pre: "عولجت بيانات الأقمار الاصطناعية بدقة 0.3–0.4 متر وعُيّرت باستخدام ",
+    execSummary2Res: "نظام المعلومات الجغرافية (GIS)",
+    execSummary2Mid: " ضمن إطار الإحداثيات ",
+    execSummary2Coord: "WGS84 / UTM Zone 30N",
+    execSummary2End: ". تراوحت شدّات الإشعاع المقاسة بين 5.01 و 69.38 CU.",
+    geoBody1Pre: "تقع المنطقة ضمن ",
+    geoBody1Strong: "حزام الصخور الخضراء البيريمي",
+    geoBody1End: " — أحد أخصب البيئات الجيولوجية للذهب في غرب أفريقيا. يتميّز الامتياز بضوابط تركيبية شمالية شرقية–جنوبية غربية وشمالية غربية–جنوبية شرقية مع ممرات تمعدن مُثبتة.",
+    geoBody2Pre: "معدل التمعدن ",
+    geoBody2Rate: "≥ 60%",
+    geoBody2Mid1: " في مناطق الشواذ وفق معايير Deep-Explor®. انحراف دقة التموضع ",
+    geoBody2Acc: "≤ 100 م",
+    geoBody2Mid2: "، خطأ العمق ",
+    geoBody2Dep: "±15%",
+    geoBody2End: ".",
+    validationPre: "تمّ اعتماد بيانات المسح من قبل ",
+    validationCompany: "Beijing Deep Leader Innovation & Intelligence Technology Co., Ltd.",
+    validationMid: " — مرجع العقد: ",
+    validationEnd: " تقنية الاستكشاف NMRAI على مساحة امتياز 40 كم٢.",
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -272,7 +349,7 @@ function CountUpIvory({
     if (!inView) return;
     const controls = animate(0, to, {
       duration: 2,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE.HOVER,
       onUpdate(v) {
         setShown(
           v.toLocaleString("en-US", {
@@ -312,7 +389,7 @@ function CountUpIvory({
 type Loc = typeof DICT["en"];
 
 export default function Discovery({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   return (
     <section className="relative w-full bg-ivory text-sovereign overflow-hidden">
       <div
@@ -359,11 +436,11 @@ function CoreSampleAct({ t }: { t: Loc }) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="mb-12 md:mb-16"
         >
           <div className="font-cinzel text-gold tracking-[0.5em] text-[10px] md:text-xs mb-3 opacity-90">
-            {t.coreSupra} · الاستكشاف والحفر
+            {t.coreSupra}
           </div>
           <h2 className="font-cinzel text-sovereign tracking-[0.08em] text-3xl md:text-5xl lg:text-6xl font-light leading-[1.05]">
             {t.coreTitleA}
@@ -416,7 +493,7 @@ function CoreSampleAct({ t }: { t: Loc }) {
               <div className="font-cinzel text-gold text-2xl md:text-3xl font-light">
                 {s.value}
               </div>
-              <div className="mt-1.5 font-cinzel text-ivory/60 tracking-[0.2em] text-[9px] uppercase">
+              <div className="mt-1.5 font-cinzel text-ivory/60 tracking-[0.2em] text-[11px] uppercase">
                 {s.label}
               </div>
             </div>
@@ -433,17 +510,24 @@ function CoreTray({ s, index }: { s: Sample; index: number }) {
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, delay: index * 0.08, ease: EASE.SPRING }}
       className="relative group overflow-hidden"
       style={{ border: "2px solid rgba(184,149,74,0.3)" }}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-sovereign/5">
+      <div
+        className="relative aspect-[3/4] overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 50%, rgba(15,30,52,0.55) 0%, rgba(6,14,28,0.95) 85%)",
+        }}
+      >
         <Image
           src={s.src}
           alt={`${s.tray} — ${s.horizon}`}
           fill
           sizes="(max-width: 768px) 50vw, 20vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className="object-contain transition-transform duration-700 group-hover:scale-105"
+          style={{ padding: "6%" }}
         />
         <div
           aria-hidden
@@ -461,7 +545,7 @@ function CoreTray({ s, index }: { s: Sample; index: number }) {
         <div className="font-cinzel text-ivory tracking-[0.15em] text-xs md:text-sm font-normal">
           {s.tray}
         </div>
-        <div className="mt-0.5 font-cinzel text-ivory/70 text-[9px] md:text-[10px] tracking-[0.1em]">
+        <div className="mt-0.5 font-cinzel text-ivory/70 text-[10px] md:text-[11px] tracking-[0.1em]">
           {s.horizon}
         </div>
       </div>
@@ -512,7 +596,7 @@ function ExplorationAct({ t }: { t: Loc }) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.7, delay: i * 0.06, ease: EASE.SNAP }}
               className="bg-sovereign text-center py-6 px-3 relative"
             >
               <span className="absolute top-0 left-[25%] right-[25%] h-[3px] bg-gold" />
@@ -522,7 +606,7 @@ function ExplorationAct({ t }: { t: Loc }) {
               >
                 <CountUpIvory to={s.value} display={s.display} decimals={s.decimals ?? 0} />
               </div>
-              <div className="mt-2 font-cinzel text-ivory/70 tracking-[0.2em] text-[9px] uppercase">
+              <div className="mt-2 font-cinzel text-ivory/70 tracking-[0.2em] text-[11px] uppercase">
                 {s.label}
               </div>
             </motion.div>

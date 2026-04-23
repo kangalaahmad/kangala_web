@@ -19,7 +19,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
 type T = {
   supra: string;
@@ -65,12 +66,12 @@ type T = {
   ceremonyAlt: string;
 };
 
-const DICT: Dict<T> = {
+const DICT: FullDict<T> = {
   en: {
     supra: "NATIONAL DISTINCTION",
     titleA: "KNIGHT OF THE ORDER",
     titleB: "OF THE STALLION",
-    subArabic: "فارس وسام الحصان — أعلى أوسمة بوركينا فاسو",
+    subArabic: "",
     subtitle: "Chevalier de l'Ordre de l'Étalon · 6 December 2024",
     badge: "Burkina Faso's Highest Honor",
     bodyP1: "The Order of the Stallion ",
@@ -113,7 +114,7 @@ const DICT: Dict<T> = {
     supra: "DISTINCTION NATIONALE",
     titleA: "CHEVALIER DE L'ORDRE",
     titleB: "DE L'ÉTALON",
-    subArabic: "فارس وسام الحصان — أعلى أوسمة بوركينا فاسو",
+    subArabic: "",
     subtitle: "Chevalier de l'Ordre de l'Étalon · 6 décembre 2024",
     badge: "Plus haute distinction du Burkina Faso",
     bodyP1: "L'Ordre de l'Étalon ",
@@ -152,10 +153,53 @@ const DICT: Dict<T> = {
     medalAlt: "Ordre de l'Étalon — la médaille burkinabé authentique, étoile dorée sur ruban rouge et vert",
     ceremonyAlt: "M. Ali Konaté portant le Chevalier de l'Ordre de l'Étalon lors de la cérémonie d'État du 6 décembre 2024 à Ouagadougou",
   },
+  ar: {
+    supra: "التكريم الوطني",
+    titleA: "فارس وسام",
+    titleB: "الفحل البوركيني",
+    subArabic: "",
+    subtitle: "Chevalier de l'Ordre de l'Étalon · 6 ديسمبر 2024",
+    badge: "أرفع وسام في بوركينا فاسو",
+    bodyP1: "وسام الفحل ",
+    orderParen: "(Ordre de l'Étalon)",
+    bodyP2: " هو أعلى الأوسمة الشرفية في بوركينا فاسو، أُسّس عام ",
+    year2017: "2017",
+    bodyP3: " ليحلّ محل الوسام الوطني السابق. في ",
+    dateCeremony: "6 ديسمبر 2024",
+    bodyP4: "، وفي حفل رسمي بواغادوغو برئاسة ",
+    traoreName: "الكابتن إبراهيم تراوري",
+    bodyP5: "، رئيس المرحلة الانتقالية، كُرّم السيد علي كوناتي برتبة فارس الوسام تقديراً لـ",
+    patriotism: "وطنيته الاستثنائية وخدمته",
+    bodyP6: " للوطن.",
+    fact1Pre: "تبرّع بـ",
+    fact1Highlight: "200 دراجة نارية",
+    fact1Post: " لمتطوّعي الدفاع عن الوطن (VDP) ومقاتلي الدوزو التقليديين في الحرب ضد الإرهاب",
+    fact2Pre: "ساهم بـ",
+    fact2Cement: "100 طن من الإسمنت",
+    fact2Mid: " و",
+    fact2Molds: "1٬000 قالب رصف",
+    fact2Post: " للمبادرة الرئاسية ",
+    fact2Initiative: "«فاسو ميبو»",
+    fact2End: " للبنية التحتية الوطنية",
+    fact3Pre: "بنى عشرات ",
+    fact3Wells: "آبار المياه",
+    fact3Mid1: "، وتبرّع بـ",
+    fact3Ambulance: "سيارة إسعاف",
+    fact3Mid2: "، وأعاد تأهيل ",
+    fact3Bridge: "جسر ناسو",
+    fact3Post: " بالكامل، ووزّع مئات الأطنان من الأرز والسكر على المجتمعات المحتاجة",
+    quote: "حين يلبّي المواطن نداء وطنه بموارده الخاصة، يتحوّل من رجل أعمال إلى ركيزة من ركائز السيادة.",
+    orderLabel: "وسام الفحل",
+    orderSub: "بوركينا فاسو",
+    ceremonyLabel: "الحفل الرسمي",
+    ceremonySub: "واغادوغو · 6 ديسمبر 2024",
+    medalAlt: "وسام الفحل — الوسام البوركيني الأصلي، نجمة ذهبية على شريط أحمر وأخضر",
+    ceremonyAlt: "السيد علي كوناتي مرتدياً وسام فارس وسام الفحل في حفل الدولة الرسمي في 6 ديسمبر 2024 بواغادوغو",
+  },
 };
 
 export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -199,11 +243,11 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="text-center mb-16 md:mb-20"
         >
           <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 opacity-80">
-            {t.supra} · BURKINA FASO · وسام وطني
+            {t.supra} · BURKINA FASO
           </div>
 
           <h2 className="font-cinzel text-ivory tracking-[0.15em] text-2xl md:text-4xl lg:text-5xl font-light leading-tight">
@@ -212,9 +256,11 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
             <span className="text-gold-gradient">{t.titleB}</span>
           </h2>
 
-          <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
-            {t.subArabic}
-          </div>
+          {t.subArabic && (
+            <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
+              {t.subArabic}
+            </div>
+          )}
 
           <div className="mt-3 font-cinzel text-ivory/45 tracking-[0.3em] text-[10px] md:text-xs uppercase">
             {t.subtitle}
@@ -242,8 +288,11 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
                 alt={t.medalAlt}
                 fill
                 sizes="(max-width: 1024px) 50vw, 20vw"
-                className="object-contain p-4"
+                className="object-contain p-4 ken-burns--b"
               />
+
+              {/* Rolex-physics shimmer — staggered 9s behind Mali medal so only one shimmers at a time */}
+              <span className="medal-shimmer medal-shimmer--delayed" aria-hidden />
 
               <div
                 aria-hidden="true"
@@ -263,7 +312,7 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
               {t.orderLabel}
             </div>
-            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
+            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[11px] uppercase">
               {t.orderSub}
             </div>
           </motion.div>
@@ -355,7 +404,7 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
                 alt={t.ceremonyAlt}
                 fill
                 sizes="(max-width: 1024px) 60vw, 25vw"
-                className="object-cover object-[50%_25%]"
+                className="object-cover object-[50%_25%] ken-burns--a"
               />
 
               <div
@@ -385,7 +434,7 @@ export default function MedalBurkina({ lang = "en" }: SceneProps = {}) {
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
               {t.ceremonyLabel}
             </div>
-            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
+            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[11px] uppercase">
               {t.ceremonySub}
             </div>
           </motion.div>

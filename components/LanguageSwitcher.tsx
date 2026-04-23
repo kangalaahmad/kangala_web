@@ -31,12 +31,10 @@ export default function LanguageSwitcher({ current }: Props) {
    *   /foo     → /fr/foo
    */
   const pathFor = (target: Lang): string => {
-    // Strip any leading /fr
-    const stripped = pathname.replace(/^\/fr(\/|$)/, "/");
-    if (target === "en") return stripped === "" ? "/" : stripped;
-    // target === "fr"
-    if (stripped === "/") return "/fr";
-    return `/fr${stripped}`;
+    const stripped = pathname.replace(/^\/(fr|ar)(\/|$)/, "/");
+    if (target === "en") return stripped || "/";
+    if (stripped === "/") return `/${target}`;
+    return `/${target}${stripped}`;
   };
 
   return (

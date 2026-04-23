@@ -14,7 +14,8 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
 type Stat = { value: string; label: string; numeric?: number; suffix?: string };
 type Capability = { num: string; title: string; desc: string };
@@ -71,7 +72,7 @@ const GALLERY_SRCS = [
   "/logistics/tank4.jpeg",
 ];
 
-const DICT: Dict<T> = {
+const DICT: FullDict<T> = {
   en: {
     topBarLeft: "Kangala Holding Group",
     topBarRight: "Visual Evidence",
@@ -79,7 +80,7 @@ const DICT: Dict<T> = {
     fleetTitleA: "FLEET",
     fleetTitleB: "MOBILIZATION",
     fleetTagline: "Documented readiness for continuous, large-scale deployment.",
-    fleetTaglineAr: "\u062c\u0627\u0647\u0632\u064a\u0629 \u0645\u0648\u062b\u0651\u0642\u0629 \u0644\u0646\u0634\u0631 \u0648\u0627\u0633\u0639 \u0627\u0644\u0646\u0637\u0627\u0642 \u062f\u0648\u0646 \u0627\u0646\u0642\u0637\u0627\u0639",
+    fleetTaglineAr: "",
     fleetStats: [
       { value: "400+", label: "Heavy-Duty Tankers", numeric: 400, suffix: "+" },
       { value: "100%", label: "Self-Owned Fleet", numeric: 100, suffix: "%" },
@@ -144,7 +145,7 @@ const DICT: Dict<T> = {
     fleetTitleA: "MOBILISATION",
     fleetTitleB: "DE LA FLOTTE",
     fleetTagline: "Capacit\u00e9 document\u00e9e de d\u00e9ploiement continu \u00e0 grande \u00e9chelle.",
-    fleetTaglineAr: "\u062c\u0627\u0647\u0632\u064a\u0629 \u0645\u0648\u062b\u0651\u0642\u0629 \u0644\u0646\u0634\u0631 \u0648\u0627\u0633\u0639 \u0627\u0644\u0646\u0637\u0627\u0642 \u062f\u0648\u0646 \u0627\u0646\u0642\u0637\u0627\u0639",
+    fleetTaglineAr: "",
     fleetStats: [
       { value: "400+", label: "Camions-citernes lourds", numeric: 400, suffix: "+" },
       { value: "100%", label: "Flotte enti\u00e8rement d\u00e9tenue", numeric: 100, suffix: "%" },
@@ -202,6 +203,71 @@ const DICT: Dict<T> = {
     quoteEnd: ".\u00a0\u00bb",
     quoteAttribution: "\u2014 Doctrine Kangala",
   },
+  ar: {
+    topBarLeft: "مجموعة كانغالا القابضة",
+    topBarRight: "دليل بصري",
+    fleetSupra: "كانغالا للنقل والهيدروكربون",
+    fleetTitleA: "تحشيد",
+    fleetTitleB: "الأسطول",
+    fleetTagline: "جاهزية موثّقة للنشر المستمر والواسع النطاق.",
+    fleetTaglineAr: "",
+    fleetStats: [
+      { value: "+400", label: "صهريج ثقيل", numeric: 400, suffix: "+" },
+      { value: "100%", label: "أسطول مملوك بالكامل", numeric: 100, suffix: "%" },
+      { value: "24/7", label: "جاهزية تشغيلية" },
+      { value: "3", label: "دول مغطاة", numeric: 3 },
+    ],
+    sovSupra: "السيادة اللوجستية",
+    sovTitleA: "القدرة على",
+    sovTitleB: "كسر الحصار",
+    sovBodyPre: "بينما يعاني الآخرون من هشاشة سلاسل الإمداد، تعمل كانغالا بـ",
+    sovBodyInd: "استقلالية لوجستية كاملة",
+    sovBodyMid: ". ينفّذ أسطولنا المحشود عمليات الإمداد في ",
+    sovBodyWave: "موجة واحدة منسّقة",
+    sovBodyEnd: ".",
+    capabilities: [
+      { num: "01", title: "امتداد ثلاثي الدول", desc: "نقل الوقود والمياه والمواد الثقيلة عبر ثلاث دول سيادية." },
+      { num: "02", title: "صفر اعتماد على أطراف ثالثة", desc: "أسطول مملوك بنسبة 100%. دون أي اعتماد على مزوّدي لوجستيات خارجيين." },
+      { num: "03", title: "تحشيد بموجة واحدة", desc: "عمليات نشر منسّقة تُلغي تأخيرات الرحلات المتعددة وتقلّل المخاطر." },
+      { num: "04", title: "صيانة ثنائية الدولة", desc: "مستودعات صيانة مخصّصة في كلٍّ من بوركينا فاسو ومالي." },
+    ],
+    depotSupra: "البنية التحتية للطاقة · عمليات الحدود",
+    depotTitleA: "مستودع",
+    depotTitleB: "الوقود الاستراتيجي",
+    depotSubtitle: "منشأة تخزين عابرة للحدود · ممر بوركينا فاسو – مالي",
+    depotNarrPre: "تمتلك مجموعة كانغالا ",
+    depotNarrTanks: "خزانات وقود عالية السعة",
+    depotNarrMid: " في منطقة حدودية استراتيجية بين بوركينا فاسو ومالي. يدعم هذا الموقع المحوري ",
+    depotNarrCross: "اللوجستيات العابرة للحدود",
+    depotNarrEnd: "، ويقلّص أوقات العبور، ويُؤمّن سلسلة إمداد الطاقة لكامل عملية التعدين.",
+    depotCards: [
+      { title: "موقع حدودي استراتيجي", body: "يقع عند معبر حدودي محوري يربط بوركينا فاسو بمالي، ويتيح التوزيع السريع للوقود لعمليات الأسطول العابرة للحدود." },
+      { title: "برنامج توسعة نشط", body: "أُسس خزانات جديدة قيد الإنشاء بالشراكة مع KGL للصناعات: سعة إضافية، وأنظمة سلامة محدّثة، وتوصيلات ميكانيكية محسّنة." },
+      { title: "الأهداف التشغيلية", body: "زيادة السعة التخزينية لتلبية الطلب المتزايد، وتعزيز سرعة العبور، وتقوية أمن الطاقة في المنطقة الحدودية، ودعم أسطول كانغالا البرّي." },
+    ],
+    depotStats: [
+      { value: "2", label: "دولتان مخدومتان" },
+      { value: "24/7", label: "توافر الوقود" },
+      { value: "KGL", label: "شريك صناعي" },
+    ],
+    depotGallery: [
+      { src: GALLERY_SRCS[0], label: "خزان وقود عالي السعة — تفتيش ميداني" },
+      { src: GALLERY_SRCS[1], label: "مستودع تخزين وقود كانغالا" },
+      { src: GALLERY_SRCS[2], label: "صمامات التوزيع وشبكة الأنابيب" },
+      { src: GALLERY_SRCS[3], label: "أساسات خزان جديد — توسعة قيد التنفيذ" },
+    ],
+    energySovTitle: "السيادة على الطاقة",
+    energySovPre: "امتلاك بنية تحتية للوقود عند ",
+    energySovChoke: "نقطة اختناق عابرة للحدود",
+    energySovMid: " يُزيل الاعتماد على الأطراف الثالثة، ويضمن عمليات أسطول دون انقطاع، ويُرسّخ كانغالا بوصفها ",
+    energySovAnchor: "مرتكزاً إقليمياً للطاقة",
+    energySovEnd: " عبر ممر الساحل.",
+    quoteA: "«مرونة سلسلة الإمداد ليست ميزة؛",
+    quoteB: " بل هي أساس ",
+    quoteHighlight: "التنفيذ السيادي",
+    quoteEnd: ".»",
+    quoteAttribution: "— مذهب كانغالا",
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -225,7 +291,7 @@ function CountUp({
     if (!inView) return;
     const controls = animate(0, to, {
       duration,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE.HOVER,
       onUpdate(v) {
         setDisplay(Math.round(v).toLocaleString("en-US"));
       },
@@ -246,7 +312,7 @@ function CountUp({
 // ═══════════════════════════════════════════════════════════════════
 
 export default function Logistics({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   return (
     <section className="relative w-full bg-sovereign overflow-hidden">
       <div
@@ -355,7 +421,7 @@ function FleetHero({ t }: { t: T }) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.2, delay: 0.6, ease: EASE.VAULT }}
           className="font-cinzel text-ivory tracking-[0.08em] text-4xl md:text-6xl lg:text-7xl font-light leading-tight"
         >
           {t.fleetTitleA}
@@ -389,7 +455,7 @@ function FleetHero({ t }: { t: T }) {
           dir="rtl"
           className="mt-3 font-cairo text-gold/70 text-xs md:text-sm"
         >
-          {t.fleetTaglineAr}
+          {t.fleetTaglineAr || null}
         </motion.div>
       </div>
 
@@ -419,7 +485,7 @@ function FleetHero({ t }: { t: T }) {
                   s.value
                 )}
               </div>
-              <div className="mt-1.5 font-cinzel text-ivory/55 tracking-[0.22em] text-[8px] md:text-[10px] uppercase">
+              <div className="mt-1.5 font-cinzel text-ivory/55 tracking-[0.22em] text-[10px] md:text-[11px] uppercase">
                 {s.label}
               </div>
             </div>
@@ -442,11 +508,11 @@ function SovereigntyAct({ t }: { t: T }) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="text-center mb-16 md:mb-20"
         >
           <div className="font-cinzel text-gold tracking-[0.5em] text-[10px] md:text-xs mb-4 opacity-80">
-            {t.sovSupra} · السيادة اللوجستية
+            {t.sovSupra}
           </div>
           <h2 className="font-cinzel text-ivory tracking-[0.1em] text-3xl md:text-5xl font-light leading-tight">
             {t.sovTitleA}
@@ -484,7 +550,7 @@ function CapabilityPillar({ c, index }: { c: Capability; index: number }) {
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: EASE.SPRING }}
       className="relative group"
     >
       <div
@@ -590,7 +656,7 @@ function FuelDepotAct({ t }: { t: T }) {
                   <div className="font-cinzel text-gold-gradient text-2xl md:text-3xl font-light">
                     {s.value}
                   </div>
-                  <div className="mt-1 font-cinzel text-ivory/50 tracking-[0.2em] text-[8px] md:text-[9px] uppercase">
+                  <div className="mt-1 font-cinzel text-ivory/50 tracking-[0.2em] text-[10px] md:text-[11px] uppercase">
                     {s.label}
                   </div>
                 </div>
@@ -642,7 +708,7 @@ function DepotPhoto({ img, index }: { img: DepotImg; index: number }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: EASE.SPRING }}
       className="relative group overflow-hidden"
       style={{ border: "1px solid rgba(212,175,90,0.22)" }}
     >
@@ -652,7 +718,7 @@ function DepotPhoto({ img, index }: { img: DepotImg; index: number }) {
           alt={img.label}
           fill
           sizes="(max-width: 768px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className={`object-cover ${index % 2 === 0 ? "ken-burns--a" : "ken-burns--b"}`}
           style={{ filter: "saturate(0.92) contrast(1.04)" }}
         />
         <div
@@ -669,7 +735,7 @@ function DepotPhoto({ img, index }: { img: DepotImg; index: number }) {
       <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-gold/70" />
 
       <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-3">
-        <div className="font-cinzel text-ivory/90 tracking-[0.12em] text-[9px] md:text-[10px] leading-tight">
+        <div className="font-cinzel text-ivory/90 tracking-[0.12em] text-[10px] md:text-[11px] leading-tight">
           {img.label}
         </div>
       </div>
@@ -683,7 +749,7 @@ function DepotCard({ card, index }: { card: DepotCardT; index: number }) {
       initial={{ opacity: 0, x: 20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, delay: 0.15 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, delay: 0.15 + index * 0.1, ease: EASE.SPRING }}
       className="relative p-4 md:p-5 group"
       style={{
         background: "rgba(6,16,34,0.35)",

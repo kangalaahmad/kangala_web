@@ -2,15 +2,47 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
-const DICT: Dict<{ supra: string; scroll: string }> = {
-  en: { supra: "SOVEREIGN INVESTMENT", scroll: "SCROLL" },
-  fr: { supra: "INVESTISSEMENT SOUVERAIN", scroll: "DÉFILER" },
+type HeroLoc = {
+  supra: string;
+  scroll: string;
+  subtitle: string;
+  tagline: string;
+  taglineGold: string;
+  dir: "ltr" | "rtl";
+};
+
+const DICT: FullDict<HeroLoc> = {
+  en: {
+    supra: "SOVEREIGN INVESTMENT",
+    scroll: "SCROLL",
+    subtitle: "Kangala Holding Group",
+    tagline: "Sovereignty is not a claim,",
+    taglineGold: "it is a legacy earned, and a duty fulfilled.",
+    dir: "ltr",
+  },
+  fr: {
+    supra: "INVESTISSEMENT SOUVERAIN",
+    scroll: "DÉFILER",
+    subtitle: "Kangala Holding Group",
+    tagline: "La souveraineté n'est pas une affirmation,",
+    taglineGold: "c'est un héritage acquis et une responsabilité exercée.",
+    dir: "ltr",
+  },
+  ar: {
+    supra: "استثمار سيادي",
+    scroll: "مرر",
+    subtitle: "مجموعة كانغالا القابضة",
+    tagline: "السيادة ليست ادعاءً،",
+    taglineGold: "بل إرثٌ يُحرز، ومسؤوليةٌ تُمارس.",
+    dir: "rtl",
+  },
 };
 
 export default function Hero({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -39,13 +71,13 @@ export default function Hero({ lang = "en" }: SceneProps = {}) {
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 2.5, delay: 1.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 2.5, delay: 1.5, ease: EASE.HOVER }}
         className="absolute top-12 left-1/2 -translate-x-1/2 w-2/3 h-[2px] bg-gold-gradient origin-center opacity-80"
       />
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 2.5, delay: 1.7, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 2.5, delay: 1.7, ease: EASE.HOVER }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-[2px] bg-gold-gradient origin-center opacity-80"
       />
 
@@ -68,20 +100,21 @@ export default function Hero({ lang = "en" }: SceneProps = {}) {
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 2.0, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 2.0, delay: 0.6, ease: EASE.VAULT }}
           className="font-cinzel text-ivory font-light display-xl tracking-[0.12em] no-select"
         >
           KANGALA
         </motion.h1>
 
-        {/* Arabic subtitle */}
+        {/* Subtitle — locale-aware */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 1.2 }}
-          className="mt-6 font-cairo text-ivory/80 text-lg md:text-2xl tracking-wider font-light"
+          className={`mt-6 text-ivory/80 text-lg md:text-2xl tracking-wider font-light ${lang === "ar" ? "font-cairo" : "font-cinzel tracking-[0.3em] text-sm md:text-base"}`}
+          dir={t.dir}
         >
-          مجموعة كانغالا القابضة
+          {t.subtitle}
         </motion.div>
 
         {/* Divider diamond */}
@@ -96,16 +129,17 @@ export default function Hero({ lang = "en" }: SceneProps = {}) {
           <div className="w-16 h-px bg-gold/60" />
         </motion.div>
 
-        {/* Tagline */}
+        {/* Tagline — locale-aware */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 2.1 }}
-          className="mt-10 font-cairo text-ivory/60 text-sm md:text-base tracking-wide max-w-xl leading-relaxed"
+          className={`mt-10 text-ivory/60 text-sm md:text-base tracking-wide max-w-xl leading-relaxed ${lang === "ar" ? "font-cairo text-right" : "font-cormorant italic text-base md:text-lg"}`}
+          dir={t.dir}
         >
-          السيادة ليست ادعاءً،
+          {t.tagline}
           <br className="md:hidden" />
-          <span className="text-gold"> بل إرثٌ يُحرز، ومسؤوليةٌ تُمارس.</span>
+          <span className="text-gold"> {t.taglineGold}</span>
         </motion.p>
       </motion.div>
 
@@ -116,7 +150,7 @@ export default function Hero({ lang = "en" }: SceneProps = {}) {
         transition={{ duration: 1.5, delay: 3 }}
         className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
       >
-        <span className="font-cinzel text-gold/60 text-[9px] tracking-[0.5em]">
+        <span className="font-cinzel text-gold/60 text-[11px] tracking-[0.5em]">
           {t.scroll}
         </span>
         <motion.div

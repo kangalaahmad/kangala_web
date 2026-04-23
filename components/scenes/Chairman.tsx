@@ -17,9 +17,9 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
 
-const DICT: Dict<{
+const DICT: FullDict<{
   supra: string;
   mrName: string;
   titleSub: string;
@@ -38,6 +38,7 @@ const DICT: Dict<{
   thumbSovereignAlt: string;
   thumbStatesmanAlt: string;
   thumbCommunityAlt: string;
+  quote: string;
 }> = {
   en: {
     supra: "THE CHAIRMAN",
@@ -58,6 +59,7 @@ const DICT: Dict<{
     thumbSovereignAlt: "Dozoba sovereign chief",
     thumbStatesmanAlt: "Mr. Ali Konaté receiving the Chevalier of the National Order of Mali",
     thumbCommunityAlt: "Ali Konaté in Dozo initiation procession",
+    quote: "We do not merely seek liquidity — we forge strategic alliances that embody our shared ambition to become the most trusted bridge between Dubai and Africa. Sovereign investment in pristine natural resources, paired with the localization of industrial processing technology.",
   },
   fr: {
     supra: "LE PRÉSIDENT",
@@ -78,19 +80,40 @@ const DICT: Dict<{
     thumbSovereignAlt: "Chef souverain Dozoba",
     thumbStatesmanAlt: "M. Ali Konaté recevant le Chevalier de l'Ordre National du Mali",
     thumbCommunityAlt: "Ali Konaté dans une procession d'initiation Dozo",
+    quote: "Nous ne cherchons pas seulement la liquidité — nous forjons des alliances stratégiques qui incarnent notre ambition commune de devenir le pont le plus fiable entre Dubaï et l'Afrique. Un investissement souverain dans des ressources naturelles vierges, associé à la localisation de la technologie de traitement industriel.",
+  },
+  ar: {
+    supra: "الرئيس",
+    mrName: "السيد علي كوناتي",
+    titleSub: "الرئيس التنفيذي · الزعيم السيادي دوزوبا",
+    credentials: "المؤهلات السيادية",
+    knightLabel: "فارس",
+    maliOrder: "الوسام الوطني لمالي",
+    stallionOrder: "وسام الفارس الذهبي · بوركينا",
+    dozoba: "دزوبا",
+    dozobaSub: "مرجعية المجتمع العليا",
+    sovereignLeadership: "القيادة السيادية",
+    kangalaHolding: "مجموعة كانغالا القابضة",
+    sovereign: "سيادي",
+    statesman: "رجل دولة",
+    community: "مجتمع",
+    portraitAlt: "السيد علي كوناتي — رئيس مجموعة كانغالا القابضة، بالزي الاحتفالي دوزوبا",
+    thumbSovereignAlt: "الزعيم السيادي دوزوبا",
+    thumbStatesmanAlt: "السيد علي كوناتي يتلقى وسام الفارس من الوسام الوطني لمالي",
+    thumbCommunityAlt: "علي كوناتي في موكب إدخال الدوزو",
+    quote: "لسنا نسعى فقط إلى السيولة — بل نصوغ تحالفاتٍ استراتيجية تُجسّد طموحنا المشترك في أن نكون الجسر الأكثر ثقةً بين دبي وأفريقيا. استثمارٌ سيادي في موارد طبيعية بكر، مقروناً بتوطين تقنية المعالجة الصناعية.",
   },
 };
 
 export default function Chairman({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  // Portrait scale + y parallax (subtle flight feel)
-  const portraitScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1.0, 1.04]);
+  // Portrait y parallax — single dominant motion (Dieter Rams: one gesture per space)
   const portraitY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   // Text column enters at 10% → 25%
@@ -131,20 +154,23 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
           >
             {/* Supra label */}
             <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-6 opacity-80">
-              {t.supra} · الرئيس
+              {t.supra}
             </div>
 
-            {/* Name */}
-            <h2 className="font-cairo display-lg font-light text-ivory leading-[1.1] tracking-tight">
-              السيد
-              <span className="text-gold-gradient font-normal"> علي كوناتي</span>
-            </h2>
+            {/* Name — Arabic heading in AR mode, Latin heading in EN/FR */}
+            {lang === "ar" ? (
+              <h2 className="font-cairo display-lg font-light text-ivory leading-[1.1] tracking-tight text-right" dir="rtl">
+                السيد
+                <span className="text-gold-gradient font-normal"> علي كوناتي</span>
+              </h2>
+            ) : (
+              <h2 className="font-cinzel display-lg font-light text-ivory leading-[1.1] tracking-[0.06em]">
+                {t.mrName}
+              </h2>
+            )}
 
-            {/* English subtitle */}
-            <div className="mt-4 font-cinzel text-gold/80 tracking-[0.35em] text-xs md:text-sm uppercase">
-              {t.mrName}
-            </div>
-            <div className="mt-2 font-cinzel text-ivory/50 tracking-[0.28em] text-[10px] md:text-xs uppercase">
+            {/* Subtitle */}
+            <div className="mt-4 font-cinzel text-ivory/50 tracking-[0.28em] text-[10px] md:text-xs uppercase">
               {t.titleSub}
             </div>
 
@@ -155,7 +181,7 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
               <div className="w-8 h-px bg-gold/20" />
             </div>
 
-            {/* The quote — the official chairman statement (verbatim from dossier) */}
+            {/* The quote — locale-resolved from DICT */}
             <blockquote className="relative">
               <span
                 aria-hidden="true"
@@ -164,15 +190,10 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
                 &ldquo;
               </span>
               <p
-                className="relative font-cairo text-ivory/85 text-base md:text-lg lg:text-xl leading-relaxed pr-4 md:pr-8"
-                dir="rtl"
+                className={`relative text-ivory/85 text-base md:text-lg lg:text-xl leading-relaxed ${lang === "ar" ? "font-cairo pr-4 md:pr-8 text-right" : "font-cormorant italic"}`}
+                dir={lang === "ar" ? "rtl" : "ltr"}
               >
-                لسنا نسعى فقط إلى السيولة — بل{" "}
-                <span className="text-ivory">نصوغ تحالفاتٍ استراتيجية</span>{" "}
-                تُجسّد طموحنا المشترك في أن نكون{" "}
-                <span className="text-gold">الجسر الأكثر ثقةً</span>{" "}
-                بين دبي وأفريقيا. استثمارٌ سيادي في موارد طبيعية بكر، مقروناً
-                بتوطين تقنية المعالجة الصناعية.
+                {t.quote}
               </p>
               <span
                 aria-hidden="true"
@@ -184,26 +205,23 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
 
             {/* Credentials row — cross-references Authority medals + Dozoba status */}
             <div className="mt-16 pt-8 border-t border-gold/15">
-              <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[9px] md:text-[10px] uppercase mb-5">
+              <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[11px] uppercase mb-5">
                 {t.credentials}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
                 <CredentialBadge
                   icon="★"
-                  labelEn={t.knightLabel}
-                  labelAr="فارس"
+                  label={t.knightLabel}
                   subLabel={t.maliOrder}
                 />
                 <CredentialBadge
                   icon="★"
-                  labelEn={t.knightLabel}
-                  labelAr="فارس"
+                  label={t.knightLabel}
                   subLabel={t.stallionOrder}
                 />
                 <CredentialBadge
                   icon="◈"
-                  labelEn={t.dozoba}
-                  labelAr="دزوبا"
+                  label={t.dozoba}
                   subLabel={t.dozobaSub}
                 />
               </div>
@@ -213,7 +231,7 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
           {/* ═══ PORTRAIT COLUMN ═══ */}
           <div className="relative order-1 md:order-2">
             <motion.div
-              style={{ scale: portraitScale, y: portraitY }}
+              style={{ y: portraitY }}
               className="relative w-full max-w-md mx-auto"
             >
               {/* Outer gold frame */}
@@ -227,7 +245,7 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
                   alt={t.portraitAlt}
                   fill
                   sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover object-[50%_35%]"
+                  className="object-cover object-[50%_35%] ken-burns--a"
                   priority
                 />
 
@@ -264,7 +282,7 @@ export default function Chairman({ lang = "en" }: SceneProps = {}) {
                   <div className="font-cinzel text-gold tracking-[0.3em] text-[10px] md:text-[11px] uppercase">
                     {t.sovereignLeadership}
                   </div>
-                  <div className="mt-1 font-cinzel text-ivory/60 tracking-[0.25em] text-[8px] md:text-[9px] uppercase">
+                  <div className="mt-1 font-cinzel text-ivory/60 tracking-[0.25em] text-[10px] md:text-[11px] uppercase">
                     {t.kangalaHolding}
                   </div>
                 </div>
@@ -335,7 +353,7 @@ function FacetThumb({
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-t from-sovereign-deep/85 via-sovereign-deep/20 to-transparent"
       />
-      <div className="absolute inset-x-0 bottom-1.5 text-center font-cinzel text-gold/90 tracking-[0.25em] text-[8px] md:text-[9px] uppercase">
+      <div className="absolute inset-x-0 bottom-1.5 text-center font-cinzel text-gold/90 tracking-[0.25em] text-[10px] md:text-[11px] uppercase">
         {label}
       </div>
     </div>
@@ -345,13 +363,11 @@ function FacetThumb({
 /* ─── Credential badge component ─── */
 function CredentialBadge({
   icon,
-  labelEn,
-  labelAr,
+  label,
   subLabel,
 }: {
   icon: string;
-  labelEn: string;
-  labelAr: string;
+  label: string;
   subLabel: string;
 }) {
   return (
@@ -362,12 +378,9 @@ function CredentialBadge({
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-cinzel text-gold tracking-[0.2em] text-[10px] uppercase">
-            {labelEn}
+            {label}
           </div>
-          <div className="font-cairo text-ivory/85 text-sm mt-0.5">
-            {labelAr}
-          </div>
-          <div className="font-cinzel text-ivory/45 text-[9px] tracking-[0.15em] uppercase mt-2 leading-tight">
+          <div className="font-cinzel text-ivory/45 text-[11px] tracking-[0.15em] uppercase mt-2 leading-tight">
             {subLabel}
           </div>
         </div>

@@ -6,12 +6,15 @@
  */
 
 import { motion } from "framer-motion";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
+import WaxSeal from "@/components/WaxSeal";
 
 type Step = { num: string; title: string; desc: string };
 type Row = { k: string; v: string };
 
 type T = {
+  invitationLabel: string;
   heroA: string;
   heroB: string;
   tagline: string;
@@ -48,8 +51,9 @@ type T = {
   standards: Row[];
 };
 
-const DICT: Dict<T> = {
+const DICT: FullDict<T> = {
   en: {
+    invitationLabel: "INVITATION",
     heroA: "CONTACT &",
     heroB: "NEXT STEPS",
     tagline: "Let's build a legacy of value together.",
@@ -103,6 +107,7 @@ const DICT: Dict<T> = {
     ],
   },
   fr: {
+    invitationLabel: "INVITATION",
     heroA: "CONTACT &",
     heroB: "PROCHAINES ÉTAPES",
     tagline: "Construisons ensemble un héritage de valeur.",
@@ -155,6 +160,60 @@ const DICT: Dict<T> = {
       { k: "Droit Minier", v: "Code Minier BF 2015 · OHADA" },
     ],
   },
+  ar: {
+    invitationLabel: "دعوة",
+    heroA: "تواصل و",
+    heroB: "الخطوات التالية",
+    tagline: "لنبنِ إرثاً من القيمة معاً.",
+    directInquiry: "تواصل مباشر",
+    subjectTag: "كارانغاسو للذهب — سري",
+    subjectPrefix: "للاستفسارات الاستثمارية، يُرجى الإشارة إلى ",
+    subjectQuoted: "«كارانغاسو للذهب — سري»",
+    subjectSuffix: " في خانة الموضوع.",
+    ourOffices: "مكاتبنا",
+    headOfficeBadge: "المقر الرئيسي",
+    dubaiCity: "دبي، الإمارات",
+    dubaiAddr2: "بورت سعيد، دبي، الإمارات",
+    dubaiRole: "المقر الرئيسي",
+    ouagaRole: "مكتب العمليات والمشاريع",
+    engagementLadder: "مسار الارتباط",
+    fromIntro: "من التعريف",
+    toExecution: "إلى التنفيذ",
+    steps: [
+      { num: "01", title: "الاجتماع الأولي", desc: "ترتيب اجتماع سري لمناقشة إطار الشراكة وعرض المشروع." },
+      { num: "02", title: "الفحص النافي للجهالة", desc: "فحص فني وقانوني مشترك. الوصول إلى غرفة البيانات مع التقارير الجيولوجية والمالية." },
+      { num: "03", title: "ورقة الشروط", desc: "التفاوض على شروط الشراكة وإنجازها. اختيار الهيكل (شركة تشغيل أو PSA) مع حوكمة متّفق عليها." },
+      { num: "04", title: "الإطلاق", desc: "إنشاء المكتب الفني المشترك وبدء تنفيذ المشروع وفق برنامج العمل المعتمد." },
+    ],
+    doctrineA: "«قيمة سيادية. رؤية مشتركة.",
+    doctrineB: " إرث مستدام.»",
+    doctrineSub: "نتطلّع إلى شراكة ناجحة وخلق قيمة مستدامة لجميع الأطراف المعنية في امتياز كارانغاسو للذهب.",
+    colophonTitle: "الختام والامتثال",
+    timelineTitle: "جدول المشروع الزمني",
+    standardsTitle: "المعايير والامتثال",
+    docRef: "مرجع الوثيقة",
+    dossierName: "ملف استثمار سيادي",
+    strictlyConfidential: "سري للغاية · ملكية حصرية",
+    legalBold: "سري وملكي حصري",
+    legalBody: " — هذه الوثيقة ملكية حصرية لمجموعة كانغالا القابضة وموجهة حصراً للمتلقّي المسمّى. لا يجوز إعادة إنتاج أي جزء منها أو توزيعه أو الإفصاح عنه دون موافقة خطية مسبقة. جميع الحقوق محفوظة.",
+    copyright: "© 2026 مجموعة كانغالا القابضة",
+    cities: "دبي · واغادوغو",
+    allRights: "جميع الحقوق محفوظة",
+    timeline: [
+      { k: "بدء الاستكشاف", v: "الربع 1 2024" },
+      { k: "إنجاز المرحلة 1", v: "الربع 2 2026" },
+      { k: "هدف المرحلة 2", v: "الربع 4 2026" },
+      { k: "التطوير", v: "2028 – 2030" },
+      { k: "عمر المنجم", v: "5 – 7 سنوات" },
+    ],
+    standards: [
+      { k: "الموارد", v: "JORC 2012" },
+      { k: "الإفصاح", v: "معتمد لدى هيئة الأوراق المالية الإماراتية" },
+      { k: "المالي", v: "IFRS" },
+      { k: "ESG", v: "معايير GRI" },
+      { k: "قانون التعدين", v: "قانون التعدين البوركيني 2015 · OHADA" },
+    ],
+  },
 };
 
 const OFFICIAL_EMAIL = "info@kangalaholding.com";
@@ -164,7 +223,7 @@ const OFFICIAL_EMAIL = "info@kangalaholding.com";
 // ═══════════════════════════════════════════════════════════════════
 
 export default function Invitation({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   return (
     <section className="relative w-full bg-sovereign text-ivory overflow-hidden">
       <div
@@ -186,6 +245,12 @@ export default function Invitation({ lang = "en" }: SceneProps = {}) {
       <OfficesAct t={t} />
       <NextStepsAct t={t} />
       <ClosingDoctrine t={t} />
+
+      {/* ═══ Wax Seal — final sovereign press, closes the dossier ═══ */}
+      <div className="relative flex justify-center py-12 md:py-16">
+        <WaxSeal size="lg" />
+      </div>
+
       <ColophonStrip t={t} />
       <LegalImprint t={t} />
     </section>
@@ -204,10 +269,10 @@ function InvitationHero({ t }: { t: T }) {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.4, ease: EASE.DISSOLVE }}
         >
           <div className="font-cinzel text-gold tracking-[0.7em] text-[10px] md:text-xs mb-6 md:mb-8 opacity-85">
-            INVITATION · دعوة سيادية
+            {t.invitationLabel}
           </div>
 
           <h2 className="font-cinzel text-ivory tracking-[0.1em] text-3xl md:text-5xl lg:text-6xl font-light leading-[1.1]">
@@ -215,15 +280,6 @@ function InvitationHero({ t }: { t: T }) {
             <br />
             <span className="text-gold-gradient font-normal">{t.heroB}</span>
           </h2>
-
-          <h3
-            dir="rtl"
-            className="mt-6 md:mt-8 font-cairo text-gold-bright text-xl md:text-3xl font-light leading-snug"
-          >
-            ندعوكم للاكتشاف،
-            <br />
-            <span className="text-ivory">حيث تبدأ الشراكات السيادية</span>
-          </h3>
 
           <div className="mt-10 flex items-center justify-center gap-4 text-gold/50">
             <div className="w-20 md:w-28 h-px bg-gold/40" />
@@ -255,7 +311,7 @@ function InvitationHero({ t }: { t: T }) {
               <span className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-gold" />
               <span className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-gold" />
 
-              <div className="font-cinzel text-gold/65 tracking-[0.35em] text-[9px] md:text-[10px] uppercase mb-1">
+              <div className="font-cinzel text-gold/65 tracking-[0.35em] text-[11px] uppercase mb-1">
                 {t.directInquiry}
               </div>
               <div
@@ -310,7 +366,7 @@ function OfficesAct({ t }: { t: T }) {
           className="text-center mb-10 md:mb-12"
         >
           <div className="font-cinzel text-gold tracking-[0.4em] text-[10px] md:text-xs uppercase opacity-85">
-            {t.ourOffices} · مكاتبنا
+            {t.ourOffices}
           </div>
           <div className="mt-2 flex items-center justify-center gap-3 text-gold/40">
             <span className="w-10 h-px bg-gold/40" />
@@ -326,7 +382,7 @@ function OfficesAct({ t }: { t: T }) {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: i * 0.12, ease: EASE.SPRING }}
               className="relative p-6 md:p-8"
               style={{ background: "rgba(6,16,34,0.5)", border: "1px solid rgba(184,149,74,0.3)", borderTop: "4px solid #B8954A" }}
             >
@@ -334,7 +390,7 @@ function OfficesAct({ t }: { t: T }) {
               <span className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-gold" />
 
               {o.primary && (
-                <div className="inline-block px-2 py-0.5 mb-3 bg-gold font-cinzel text-ivory tracking-[0.3em] text-[9px] font-bold uppercase">
+                <div className="inline-block px-2 py-0.5 mb-3 bg-gold font-cinzel text-ivory tracking-[0.3em] text-[10px] font-bold uppercase">
                   {t.headOfficeBadge}
                 </div>
               )}
@@ -382,7 +438,7 @@ function NextStepsAct({ t }: { t: T }) {
           className="text-center mb-10 md:mb-14"
         >
           <div className="font-cinzel text-gold tracking-[0.5em] text-[10px] md:text-xs mb-3 opacity-90">
-            {t.engagementLadder} · خطوات الشراكة
+            {t.engagementLadder}
           </div>
           <h2 className="font-cinzel text-ivory tracking-[0.08em] text-2xl md:text-4xl font-light leading-tight">
             {t.fromIntro}
@@ -398,7 +454,7 @@ function NextStepsAct({ t }: { t: T }) {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.7, delay: i * 0.1, ease: EASE.SPRING }}
               className="relative p-5 md:p-6 flex flex-col"
               style={{ background: "rgba(6,16,34,0.5)", border: "1px solid rgba(184,149,74,0.3)", borderTop: "3px solid #B8954A" }}
             >
@@ -505,7 +561,7 @@ function ColophonCard({ title, rows }: { title: string; rows: Row[] }) {
       <div className="space-y-2">
         {rows.map((r) => (
           <div key={r.k} className="grid grid-cols-[110px_1fr] gap-3 text-[12.5px] md:text-[13px]">
-            <span className="font-cinzel text-gold/70 tracking-[0.15em] text-[9px] md:text-[10px] uppercase">
+            <span className="font-cinzel text-gold/70 tracking-[0.15em] text-[10px] md:text-[11px] uppercase">
               {r.k}
             </span>
             <span className="font-cormorant text-ivory/80 leading-snug">{r.v}</span>
@@ -542,7 +598,7 @@ function ColophonReference({ t }: { t: T }) {
         <div className="font-cormorant italic text-ivory/75 text-sm leading-relaxed mb-3">
           {t.dossierName}
         </div>
-        <div className="pt-3 border-t border-gold/15 font-cinzel text-ivory/55 tracking-[0.2em] text-[9px] md:text-[10px] uppercase leading-relaxed">
+        <div className="pt-3 border-t border-gold/15 font-cinzel text-ivory/55 tracking-[0.2em] text-[10px] md:text-[11px] uppercase leading-relaxed">
           {t.strictlyConfidential}
         </div>
       </div>
@@ -571,15 +627,15 @@ function LegalImprint({ t }: { t: T }) {
         </p>
 
         <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 text-center">
-          <span className="font-cinzel text-gold tracking-[0.4em] text-[9px] md:text-[10px] uppercase font-semibold">
+          <span className="font-cinzel text-gold tracking-[0.4em] text-[10px] md:text-[11px] uppercase font-semibold">
             {t.copyright}
           </span>
           <span className="hidden md:inline-block w-px h-4 bg-gold/40" />
-          <span className="font-cinzel text-ivory/50 tracking-[0.35em] text-[9px] md:text-[10px] uppercase">
+          <span className="font-cinzel text-ivory/50 tracking-[0.35em] text-[10px] md:text-[11px] uppercase">
             {t.cities}
           </span>
           <span className="hidden md:inline-block w-px h-4 bg-gold/40" />
-          <span className="font-cinzel text-ivory/50 tracking-[0.35em] text-[9px] md:text-[10px] uppercase">
+          <span className="font-cinzel text-ivory/50 tracking-[0.35em] text-[10px] md:text-[11px] uppercase">
             {t.allRights}
           </span>
         </div>

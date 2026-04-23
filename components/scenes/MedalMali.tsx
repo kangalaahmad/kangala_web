@@ -21,9 +21,10 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import type { Dict, SceneProps } from "@/lib/i18n";
+import type { FullDict, SceneProps } from "@/lib/i18n";
+import { EASE } from "@/lib/easing";
 
-const DICT: Dict<{
+const DICT: FullDict<{
   supra: string;
   titleA: string;
   titleB: string;
@@ -58,7 +59,7 @@ const DICT: Dict<{
     supra: "PRESIDENTIAL DISTINCTION",
     titleA: "KNIGHT OF THE NATIONAL",
     titleB: "ORDER OF MALI",
-    subArabic: "فارس الوسام الوطني لجمهورية مالي",
+    subArabic: "",
     established: "Chevalier de l'Ordre National du Mali · Est. 31 May 1963",
     badge: "Mali's Highest Honorific Order",
     bodyPart1: "The National Order of Mali ",
@@ -89,7 +90,7 @@ const DICT: Dict<{
     supra: "DISTINCTION PRÉSIDENTIELLE",
     titleA: "CHEVALIER DE L'ORDRE",
     titleB: "NATIONAL DU MALI",
-    subArabic: "فارس الوسام الوطني لجمهورية مالي",
+    subArabic: "",
     established: "Chevalier de l'Ordre National du Mali · Inst. 31 mai 1963",
     badge: "Plus haute distinction honorifique du Mali",
     bodyPart1: "L'Ordre National du Mali ",
@@ -116,10 +117,41 @@ const DICT: Dict<{
     medalAlt: "Chevalier de l'Ordre National du Mali — la médaille authentique, croix d'argent émaillée d'or avec monogramme RM",
     ceremonyAlt: "M. Ali Konaté tenant le décret de Chevalier de l'Ordre National du Mali lors de la cérémonie officielle d'État à Bamako",
   },
+  ar: {
+    supra: "التكريم الرئاسي",
+    titleA: "فارس الوسام الوطني",
+    titleB: "لجمهورية مالي",
+    subArabic: "",
+    established: "Chevalier de l'Ordre National du Mali · تأسّس في 31 مايو 1963",
+    badge: "أرفع وسام شرفي في جمهورية مالي",
+    bodyPart1: "الوسام الوطني لمالي ",
+    orderParen: "(Ordre National du Mali)",
+    bodyPart2: " هو أعلى الأوسمة الشرفية في جمهورية مالي، أُسّس في ",
+    dateHighlight: "31 مايو 1963",
+    bodyPart3: " احتفاءً بالاستقلال الوطني، على غرار وسام جوقة الشرف الفرنسي، ويُمنح بـ",
+    decreeHighlight: "مرسوم رئاسي",
+    bodyPart4: ". في تكريم غير مسبوق، منح رئيس جمهورية مالي شخصياً رتبة فارس للسيد علي كوناتي — ",
+    citizenHighlight: "وهو مواطن بوركيني الجنسية",
+    bodyPart5: ".",
+    fact1: "مُنح شخصياً من رئيس جمهورية مالي في حفل رسمي بالعاصمة باماكو",
+    fact2PreLink: "علي كوناتي مواطن بوركيني الجنسية — ",
+    fact2Link: "أوّل مواطن غير مالي",
+    fact2Post: " يُمنح هذا الوسام، المُخصَّص تاريخياً لرؤساء الدول كأردوغان وكيم إيل سونغ",
+    fact3Pre: "يضم الوسام ",
+    fact3Grades: "خمس رتب",
+    fact3Post: ": الصليب الأكبر، والضابط الأكبر، والقائد، والضابط، والفارس — وتُمنح للمساهمات الاستثنائية في التنمية الوطنية",
+    quote: "حين تمنح دولة ذات سيادة أرفعَ أوسمتها لمواطن أجنبي، فإنها تُعلن رابطة أعمق من الدبلوماسية — رابطة صاغتها الخدمة.",
+    orderLabel: "الوسام الوطني لمالي",
+    orderSub: "R.M. · جمهورية مالي",
+    ceremonyLabel: "الحفل الرسمي",
+    ceremonySub: "باماكو · جمهورية مالي",
+    medalAlt: "فارس الوسام الوطني لمالي — الوسام الأصلي، صليب فضي بمينا ذهبية وحرف R.M.",
+    ceremonyAlt: "السيد علي كوناتي يحمل مرسوم رتبة فارس الوسام الوطني لمالي في الحفل الرسمي بباماكو",
+  },
 };
 
 export default function MedalMali({ lang = "en" }: SceneProps = {}) {
-  const t = DICT[lang];
+  const t = DICT[lang ?? "en"];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -168,11 +200,11 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, ease: EASE.DISSOLVE }}
           className="text-center mb-16 md:mb-20"
         >
           <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 opacity-80">
-            {t.supra} · وسام رئاسي
+            {t.supra}
           </div>
 
           <h2 className="font-cinzel text-ivory tracking-[0.15em] text-2xl md:text-4xl lg:text-5xl font-light leading-tight">
@@ -181,9 +213,11 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
             <span className="text-gold-gradient">{t.titleB}</span>
           </h2>
 
-          <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
-            {t.subArabic}
-          </div>
+          {t.subArabic && (
+            <div className="mt-4 font-cairo text-gold/75 text-sm md:text-base" dir="rtl">
+              {t.subArabic}
+            </div>
+          )}
 
           <div className="mt-3 font-cinzel text-ivory/45 tracking-[0.3em] text-[10px] md:text-xs uppercase">
             {t.established}
@@ -213,8 +247,11 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
                 alt={t.medalAlt}
                 fill
                 sizes="(max-width: 1024px) 50vw, 20vw"
-                className="object-contain p-4"
+                className="object-contain p-4 ken-burns--a"
               />
+
+              {/* Rolex-physics shimmer — diagonal light sweep every 18s */}
+              <span className="medal-shimmer" aria-hidden />
 
               {/* Soft gold glow behind medal */}
               <div
@@ -236,7 +273,7 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
               {t.orderLabel}
             </div>
-            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
+            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[11px] uppercase">
               {t.orderSub}
             </div>
           </motion.div>
@@ -311,7 +348,7 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
                 alt={t.ceremonyAlt}
                 fill
                 sizes="(max-width: 1024px) 60vw, 25vw"
-                className="object-cover object-[50%_20%]"
+                className="object-cover object-[50%_20%] ken-burns--b"
               />
 
               {/* Vignette */}
@@ -344,7 +381,7 @@ export default function MedalMali({ lang = "en" }: SceneProps = {}) {
             <div className="mt-4 text-center font-cinzel text-gold/80 tracking-[0.25em] text-[10px] uppercase">
               {t.ceremonyLabel}
             </div>
-            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[9px] uppercase">
+            <div className="mt-1 text-center font-cinzel text-ivory/40 tracking-[0.2em] text-[11px] uppercase">
               {t.ceremonySub}
             </div>
           </motion.div>

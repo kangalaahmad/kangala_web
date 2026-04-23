@@ -15,41 +15,40 @@ import Governance from "@/components/scenes/Governance";
 import Invitation from "@/components/scenes/Invitation";
 import SovereignHorizon from "@/components/SovereignHorizon";
 
-// Force dynamic rendering so cookies() is re-read on every request.
 export const dynamic = "force-dynamic";
 
 /**
- * French locale route — /fr
+ * Arabic locale route — /ar
  *
- * Renders the full sovereign dossier with every scene receiving
- * `lang="fr"`. Each scene carries its own verbatim French copy
- * sourced from the official Sovereign_Final HTML masters.
+ * All scenes receive `lang="ar"`. Scenes with full AR translations
+ * (Hero, Chairman, FleetConvoy) render Arabic content directly.
+ * Other scenes fall back to English via resolveLang().
  */
-export default async function FrenchHomePage() {
+export default async function ArabicHomePage() {
   const authed = await isAuthenticated();
 
   return (
-    <AuthShell isAuthed={authed} lang="fr">
+    <AuthShell isAuthed={authed} lang="ar">
       <main>
-        <Hero lang="fr" />
-        <Chairman lang="fr" />
-        <MedalMali lang="fr" />
-        <MedalBurkina lang="fr" />
+        <Hero lang="ar" />
+        <Chairman lang="ar" />
+        <MedalMali lang="ar" />
+        <MedalBurkina lang="ar" />
         <SovereignHorizon />
-        <AssetArchitecture lang="fr" />
+        <AssetArchitecture lang="ar" />
         <SovereignHorizon />
-        <FleetConvoy lang="fr" />
-        <Logistics lang="fr" />
-        <TheLand lang="fr" />
+        <FleetConvoy lang="ar" />
+        <Logistics lang="ar" />
+        <TheLand lang="ar" />
         <SovereignHorizon />
-        <Discovery lang="fr" />
+        <Discovery lang="ar" />
         <SovereignHorizon />
-        <Numbers lang="fr" />
-        <Investment lang="fr" />
+        <Numbers lang="ar" />
+        <Investment lang="ar" />
         <SovereignHorizon />
-        <Governance lang="fr" />
+        <Governance lang="ar" />
         <SovereignHorizon />
-        <Invitation lang="fr" />
+        <Invitation lang="ar" />
       </main>
     </AuthShell>
   );

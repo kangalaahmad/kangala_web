@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo, Cinzel, Cormorant_Garamond, Inter, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import CinematicAtmosphere from "@/components/CinematicAtmosphere";
 
 /* ─────────────────────── Font loading strategy ───────────────────────
    Goal: eliminate FOUT (Flash of Unstyled Text).
@@ -79,11 +80,17 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="ar"
-      dir="rtl"
+      lang="en"
+      dir="ltr"
       className={`${cairo.variable} ${naskh.variable} ${cinzel.variable} ${cormorant.variable} ${inter.variable}`}
     >
-      <body className="font-cairo antialiased">
+      <body className="font-inter antialiased bg-[#061022] relative">
+        {/* ══════════════════════════════════════════════════════════════
+            OPERATION CINEMATIC VAULT — Global Atmosphere (PHASE 1)
+            Breathing Vignette + God Rays + Film Grain + static Spotlight
+            All fixed, pointer-events:none, prefers-reduced-motion aware.
+           ══════════════════════════════════════════════════════════════ */}
+        <CinematicAtmosphere />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
