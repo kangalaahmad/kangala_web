@@ -68,101 +68,130 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
     offset: ["start start", "end end"],
   });
 
-  // Text block entrance
+  // ─── Desktop: text enters once at the top ───
   const textOpacity = useTransform(scrollYProgress, [0.0, 0.1], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0.0, 0.1], [40, 0]);
+  const textY       = useTransform(scrollYProgress, [0.0, 0.1], [40, 0]);
 
-  // Map fade-in (map itself handles camera/layers via scrollProgress)
-  const mapOpacity = useTransform(scrollYProgress, [0.03, 0.2], [0, 1]);
+  // ─── All breakpoints: map fades in early (renders behind cover on mobile) ───
+  const mapOpacity  = useTransform(scrollYProgress, [0.03, 0.18], [0, 1]);
+
+  // ─── Mobile phase 1: text intro ───
+  // Enters 0→0.08, holds 0.08→0.22, exits upward 0.22→0.34
+  const mobileTextOpacity = useTransform(
+    scrollYProgress, [0, 0.07, 0.22, 0.34], [0, 1, 1, 0]
+  );
+  const mobileTextY = useTransform(
+    scrollYProgress, [0, 0.07, 0.22, 0.34], [32, 0, 0, -55]
+  );
+
+  // ─── Mobile phase 2: sovereign cover lifts to reveal map ───
+  // Covers map during text phase; fades away 0.22→0.38
+  const mobileCoverOpacity = useTransform(scrollYProgress, [0.22, 0.38], [1, 0]);
 
   return (
     <section ref={ref} className="relative h-[400vh] w-full bg-sovereign">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
 
-        {/* ── MAP — full-screen background on ALL breakpoints ── */}
+        {/* ══ MAP — always full-screen background (renders early, hidden on mobile by cover) ══ */}
         <motion.div style={{ opacity: mapOpacity }} className="absolute inset-0">
-          {/* Mobile vignette: darken top + bottom so text is readable */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none z-10 md:hidden"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(10,25,47,0.78) 0%, rgba(10,25,47,0.15) 45%, rgba(10,25,47,0.65) 100%)",
-            }}
+          {/* Mobile vignette: subtle edges */}
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none z-10 md:hidden"
+            style={{ background: "linear-gradient(180deg, rgba(10,25,47,0.45) 0%, transparent 35%, rgba(10,25,47,0.45) 100%)" }}
           />
-          {/* Desktop vignette: dark band on the left (behind text), clear on right */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none z-10 hidden md:block"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(10,25,47,0.92) 0%, rgba(10,25,47,0.60) 36%, rgba(10,25,47,0.08) 54%, rgba(10,25,47,0.50) 82%, rgba(10,25,47,0.80) 100%)",
-            }}
+          {/* Desktop vignette: dark on left for text readability, open on right */}
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none z-10 hidden md:block"
+            style={{ background: "linear-gradient(to right, rgba(10,25,47,0.92) 0%, rgba(10,25,47,0.60) 36%, rgba(10,25,47,0.08) 54%, rgba(10,25,47,0.50) 82%, rgba(10,25,47,0.80) 100%)" }}
           />
-          {/* Corner accent frames */}
+          {/* Desktop corner frames */}
           <div className="hidden md:block absolute top-[6%] right-[4%] w-8 h-8 border-t border-r border-gold/40 z-20 pointer-events-none" />
           <div className="hidden md:block absolute bottom-[6%] right-[4%] w-8 h-8 border-b border-r border-gold/40 z-20 pointer-events-none" />
           <div className="hidden md:block absolute top-[6%] left-[42%] w-8 h-8 border-t border-l border-gold/40 z-20 pointer-events-none" />
           <div className="hidden md:block absolute bottom-[6%] left-[42%] w-8 h-8 border-b border-l border-gold/40 z-20 pointer-events-none" />
-
           <SovereignMap scrollProgress={scrollYProgress} />
         </motion.div>
 
-        {/* Faint cartographic grid */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none opacity-[0.018] z-[11]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(184,149,74,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(184,149,74,0.6) 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
+        {/* Cartographic grid */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-[0.018] z-[11]"
+          style={{ backgroundImage: "linear-gradient(rgba(184,149,74,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(184,149,74,0.6) 1px, transparent 1px)", backgroundSize: "80px 80px" }}
         />
 
-        {/* ── TEXT PANEL — overlay on mobile, left-column on desktop ── */}
-        <div className="relative z-20 h-full flex flex-col justify-center">
-          <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-            <motion.div
-              style={{ opacity: textOpacity, y: textY }}
-              className={[
-                "relative w-full md:w-[44%]",
-                /* mobile: frosted card so text is legible over map */
-                "bg-sovereign/75 md:bg-transparent",
-                "backdrop-blur-sm md:backdrop-blur-none",
-                "border border-gold/15 md:border-0",
-                "rounded-sm md:rounded-none",
-                "px-5 py-6 md:p-0",
-              ].join(" ")}
-            >
-              <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 md:mb-6 opacity-80">
+        {/* ══ MOBILE PHASE 1: Sovereign cover (hides map while text is reading) ══ */}
+        <motion.div
+          style={{ opacity: mobileCoverOpacity }}
+          className="md:hidden absolute inset-0 bg-sovereign z-[12] pointer-events-none"
+        />
+
+        {/* ══ MOBILE PHASE 1: Text intro screen ══ */}
+        <motion.div
+          style={{ opacity: mobileTextOpacity, y: mobileTextY }}
+          className="md:hidden absolute inset-0 z-[13] flex flex-col justify-center px-6"
+        >
+          <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] mb-4 opacity-80">
+            {t.supra}
+          </div>
+          <h2 className="font-cinzel text-4xl font-light text-ivory leading-[1.15] tracking-tight">
+            {t.headlineA}
+            <br />
+            <span className="text-gold-gradient font-normal">{t.headlineB}</span>
+          </h2>
+          <div className="mt-5 mb-5 flex items-center gap-4 text-gold/50">
+            <div className="w-16 h-px bg-gold/40" />
+            <span className="text-xs">◆</span>
+            <div className="w-6 h-px bg-gold/20" />
+          </div>
+          <p className="font-inter text-ivory/75 text-sm leading-relaxed mb-6">
+            {t.body}
+          </p>
+          <div className="inline-block relative self-start">
+            <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-gold/60" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-gold/60" />
+            <div className="border border-gold/20 bg-sovereign-deep/40 px-5 py-4">
+              <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[10px] uppercase mb-2">
+                {t.concessionLabel}
+              </div>
+              <div className="font-cinzel text-ivory text-lg font-light tabular-nums">
+                <span className="text-gold/70 text-[10px] tracking-[0.3em] uppercase block mb-1">
+                  {t.areaLabel}
+                </span>
+                40 km²
+              </div>
+            </div>
+          </div>
+          {/* Mobile scroll hint */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/35 text-[10px] tracking-[0.5em] pointer-events-none">
+            {t.scrollReveal}
+          </div>
+        </motion.div>
+
+        {/* ══ DESKTOP: Text overlay left panel ══ */}
+        <div className="hidden md:flex relative z-20 h-full items-center">
+          <div className="container mx-auto px-12 max-w-7xl">
+            <motion.div style={{ opacity: textOpacity, y: textY }} className="relative w-[44%]">
+              <div className="font-cinzel text-gold tracking-[0.6em] text-xs mb-6 opacity-80">
                 {t.supra}
               </div>
-
-              <h2 className="font-cinzel text-3xl md:text-5xl lg:text-6xl font-light text-ivory leading-[1.15] tracking-tight">
+              <h2 className="font-cinzel text-5xl lg:text-6xl font-light text-ivory leading-[1.15] tracking-tight">
                 {t.headlineA}
                 <br />
                 <span className="text-gold-gradient font-normal">{t.headlineB}</span>
               </h2>
-
-              <div className="mt-5 mb-5 md:mt-8 md:mb-8 flex items-center gap-4 text-gold/50">
-                <div className="w-16 md:w-20 h-px bg-gold/40" />
+              <div className="mt-8 mb-8 flex items-center gap-4 text-gold/50">
+                <div className="w-20 h-px bg-gold/40" />
                 <span className="text-xs">◆</span>
-                <div className="w-6 md:w-8 h-px bg-gold/20" />
+                <div className="w-8 h-px bg-gold/20" />
               </div>
-
-              <p className="font-inter text-ivory/75 text-sm md:text-base lg:text-lg leading-relaxed max-w-xl">
+              <p className="font-inter text-ivory/75 text-base lg:text-lg leading-relaxed max-w-xl">
                 {t.body}
               </p>
-
-              <div className="mt-6 md:mt-12 inline-block relative">
+              <div className="mt-12 inline-block relative">
                 <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-gold/60" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-gold/60" />
-                <div className="border border-gold/20 bg-sovereign-deep/40 px-5 py-4 md:px-7 md:py-5">
-                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[10px] md:text-[11px] uppercase mb-2">
+                <div className="border border-gold/20 bg-sovereign-deep/40 px-7 py-5">
+                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[11px] uppercase mb-2">
                     {t.concessionLabel}
                   </div>
-                  <div className="font-cinzel text-ivory text-lg md:text-2xl font-light tabular-nums">
-                    <span className="text-gold/70 text-[10px] md:text-[11px] tracking-[0.3em] uppercase block mb-1">
+                  <div className="font-cinzel text-ivory text-2xl font-light tabular-nums">
+                    <span className="text-gold/70 text-[11px] tracking-[0.3em] uppercase block mb-1">
                       {t.areaLabel}
                     </span>
                     40 km²
@@ -173,8 +202,8 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[11px] tracking-[0.5em] pointer-events-none">
+        {/* Desktop scroll indicator */}
+        <div className="hidden md:block absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[11px] tracking-[0.5em] pointer-events-none">
           {t.scrollReveal}
         </div>
       </div>
