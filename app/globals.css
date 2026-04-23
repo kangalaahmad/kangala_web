@@ -216,23 +216,23 @@ html { font-display: swap; }
 /* ─── Country label overlays (Cinzel typography, tracks map pan/zoom) ─── */
 .sovereign-country-label {
   font-family: var(--font-cinzel), serif;
-  color: rgba(218, 211, 198, 0.70);
+  color: rgba(10, 25, 47, 0.72);
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(10,25,47,0.8);
+  text-shadow: 0 1px 3px rgba(255,255,255,0.6);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
-  font-weight: 300;
+  font-weight: 400;
 }
 .sovereign-country-label--sm { font-size: 8px; letter-spacing: 0.25em; }
 .sovereign-country-label--md { font-size: 11px; letter-spacing: 0.35em; }
 .sovereign-country-label--lg { font-size: 13px; letter-spacing: 0.45em; }
 .sovereign-country-label--xl {
-  font-size: 16px;
+  font-size: 17px;
   letter-spacing: 0.55em;
-  color: #D4AF5A;
-  font-weight: 400;
-  text-shadow: 0 0 16px rgba(212,175,90,0.55), 0 0 32px rgba(212,175,90,0.25), 0 1px 2px rgba(10,25,47,0.9);
+  color: #8A6A20;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 2px 6px rgba(10,25,47,0.25);
 }
 .sovereign-country-label--sovereign {
   position: relative;
@@ -244,9 +244,9 @@ html { font-display: swap; }
   top: 120%;
   transform: translateX(-50%);
   width: 60%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #B8954A, transparent);
-  opacity: 0.7;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #8A6A20, transparent);
+  opacity: 0.8;
 }
 
 /* ─── Capital marker (Ouagadougou) ─── */
@@ -276,14 +276,14 @@ html { font-display: swap; }
 .sovereign-capital__name {
   font-size: 9px;
   letter-spacing: 0.3em;
-  color: #F5F0E8;
-  text-shadow: 0 1px 3px rgba(10,25,47,0.9);
+  color: rgba(10,25,47,0.85);
+  text-shadow: 0 1px 2px rgba(255,255,255,0.7);
 }
 .sovereign-capital__tag {
   font-size: 6.5px;
   letter-spacing: 0.2em;
-  color: #B8954A;
-  text-shadow: 0 1px 2px rgba(10,25,47,0.9);
+  color: #7A5A18;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.7);
   margin-top: 2px;
 }
 

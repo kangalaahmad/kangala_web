@@ -68,19 +68,49 @@ const TARGETS: Array<{
   },
 ];
 
-// Gold vein — traces through the 3 priority targets inside the 40 km² permit.
-// Path enters from the NE corner of the concession, passes through each target,
-// and exits SW — following Birimian structural trend at 11.45°N, 3.01°W.
-const VEIN_COORDINATES: [number, number][] = [
-  [-2.995, 11.462], // NE entry (concession boundary)
-  [-3.005, 11.458],
-  [-3.012, 11.455], // G-21 (URGENT)
-  [-3.011, 11.452],
-  [-3.009, 11.448], // G-6 (URGENT, primary)
-  [-3.012, 11.450],
-  [-3.015, 11.451], // G-8 (FAST TRACK / surface-proximal)
-  [-3.020, 11.447],
-  [-3.028, 11.442], // SW exit (concession boundary)
+// The Birimian Greenstone Belt — Paleoproterozoic gold-bearing formation
+// crossing Mali → Burkina Faso → Niger (Liptako-Gourma region).
+// Path follows the real NE-trending structural geology of the West African Craton.
+// Our concession (11.4503°N / 3.0112°W) sits on the Boromo segment.
+const BIRIMIAN_BELT: [number, number][] = [
+  // ── Mali: Kédougou-Kéniéba gold district (western anchor) ──
+  [-11.8, 12.0],
+  [-11.2, 12.4],
+  [-10.5, 12.2],
+  [-9.8,  12.6],
+  [-9.2,  12.8],
+  // ── Mali: Bougouni-Yanfolila corridor ──
+  [-8.6,  12.5],
+  [-8.0,  12.9],
+  [-7.4,  13.1],
+  [-6.8,  12.8],
+  [-6.2,  13.0],
+  [-5.6,  12.6],
+  // ── Burkina Faso: Houndé Belt (western entry) ──
+  [-5.0,  12.2],
+  [-4.5,  11.9],
+  [-4.1,  11.7],
+  [-3.8,  11.6],
+  [-3.5,  11.55],
+  // ── Burkina Faso: Boromo Belt — OUR CONCESSION ──
+  [-3.2,  11.5],
+  [-3.01, 11.45],   // concession center 11.4503°N, 3.0112°W
+  [-2.8,  11.35],
+  // ── Burkina Faso: Fada N'Gourma corridor ──
+  [-2.4,  11.1],
+  [-1.9,  11.3],
+  [-1.5,  11.8],
+  // ── Burkina / Niger border: Liptako-Gourma region ──
+  [-1.0,  12.2],
+  [-0.5,  12.7],
+  [-0.1,  13.1],
+  // ── Niger: Tillabéri gold province ──
+  [ 0.4,  13.5],
+  [ 0.9,  13.9],
+  [ 1.5,  14.3],
+  [ 2.1,  14.8],
+  // ── Niger: Dosso / In-Gall region (eastern terminus) ──
+  [ 2.6,  15.2],
 ];
 
 // Simplified Burkina Faso outline (~30 points, based on Natural Earth).
@@ -114,6 +144,7 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const rafRef = useRef<number | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -131,10 +162,10 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
     try {
       map = new maplibregl.Map({
         container: containerRef.current,
-        style: `https://api.maptiler.com/maps/streets-dark/style.json?key=${key}`,
-        center: [-1.5, 12.5], // regional start
-        zoom: 4.8,
-        pitch: 10,
+        style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${key}`,
+        center: [-3.0, 13.5], // belt corridor start (Mali → Burkina → Niger)
+        zoom: 4.2,
+        pitch: 12,
         bearing: 0,
         interactive: false,
         attributionControl: { compact: true },
@@ -193,10 +224,7 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           });
         }
 
-        // ── 2. Water = Sovereign #0A192F — seamless with UI background ──
-        try {
-          map.setPaintProperty("water", "fill-color", "#0A192F");
-        } catch {}
+        // ── 2. Keep outdoor-v2 water defaults (natural blue — not overriding) ──
 
         // ── 3. 3D terrain ──
         map.addSource("maptiler-terrain", {
@@ -276,8 +304,8 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           },
         });
 
-        // ── 6. Gold vein — GeoJSON with lineMetrics for progress reveal ──
-        map.addSource("gold-vein", {
+        // ── 6. Birimian Belt — geological gold vein crossing Mali→Burkina→Niger ──
+        map.addSource("birimian-belt", {
           type: "geojson",
           lineMetrics: true,
           data: {
@@ -285,33 +313,47 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
             properties: {},
             geometry: {
               type: "LineString",
-              coordinates: VEIN_COORDINATES,
+              coordinates: BIRIMIAN_BELT,
             },
           },
         });
 
-        // Bloom (wide, blurred)
+        // Geological zone (wide ambient glow — shows extent of the formation)
         map.addLayer({
-          id: "vein-bloom",
+          id: "belt-zone",
           type: "line",
-          source: "gold-vein",
+          source: "birimian-belt",
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
-            "line-color": "#D4AF5A",
-            "line-width": 32,
-            "line-blur": 14,
+            "line-color": "#B8954A",
+            "line-width": 60,
+            "line-blur": 28,
             "line-opacity": 0,
           },
         });
 
-        // Body (gradient for progressive reveal)
+        // Bloom (molten glow)
         map.addLayer({
-          id: "vein-body",
+          id: "belt-bloom",
           type: "line",
-          source: "gold-vein",
+          source: "birimian-belt",
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
-            "line-width": 5.5,
+            "line-color": "#D4AF5A",
+            "line-width": 28,
+            "line-blur": 12,
+            "line-opacity": 0,
+          },
+        });
+
+        // Body — the vein streak (gradient progressive reveal)
+        map.addLayer({
+          id: "belt-body",
+          type: "line",
+          source: "birimian-belt",
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-width": 5,
             "line-opacity": 0,
             "line-gradient": [
               "interpolate",
@@ -323,14 +365,14 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           },
         });
 
-        // Molten core (bright highlight)
+        // Core — bright molten centre
         map.addLayer({
-          id: "vein-core",
+          id: "belt-core",
           type: "line",
-          source: "gold-vein",
+          source: "birimian-belt",
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
-            "line-width": 1.2,
+            "line-width": 1.5,
             "line-opacity": 0,
             "line-gradient": [
               "interpolate",
@@ -419,69 +461,77 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
     };
   }, [key]);
 
-  // ══ Scroll-driven camera + layer animation ══
+  // ══ Scroll-driven camera + layer animation — RAF-throttled for smooth 60fps ══
   useMotionValueEvent(scrollProgress, "change", (p) => {
-    const map = mapRef.current;
-    if (!map || !isReady) return;
+    // Cancel any pending frame and schedule a fresh one — ensures we always
+    // execute the LATEST scroll value with at most one GPU update per frame.
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const map = mapRef.current;
+      if (!map || !isReady) return;
 
-    // Camera — cinematic zoom from regional to concession
-    //   0.0–0.3: regional flight (West Africa overview)
-    //   0.3–0.7: dramatic zoom toward Burkina's west (40 km² target)
-    //   0.7–1.0: settle on concession, slight orbit for depth
-    const zoom =
-      p < 0.3
-        ? lerp(4.8, 5.8, smoothstep(0, 0.3, p))
-        : lerp(5.8, 11.8, smoothstep(0.3, 0.8, p));
-    const pitch = lerp(10, 55, smoothstep(0.15, 0.75, p));
-    const bearing = lerp(0, -15, smoothstep(0.6, 0.95, p));
-    // Center progressively migrates to real concession at 11.4503°N, 3.0112°W
-    const centerLng = lerp(-1.5, -3.0112, smoothstep(0.15, 0.7, p));
-    const centerLat = lerp(12.5, 11.4503, smoothstep(0.15, 0.7, p));
+      // ─── Camera choreography ───────────────────────────────────────────
+      // 0.00–0.20  Full belt corridor visible (Mali → Niger), wide view
+      // 0.20–0.55  Belt draws west→east; Burkina territory fades in
+      // 0.55–0.80  Camera zooms into Burkina / concession zone
+      // 0.80–0.95  Target markers ignite
+      // 0.70–1.00  Slight bearing orbit for cinematic depth
+      const zoom =
+        p < 0.55
+          ? lerp(4.2, 5.5, smoothstep(0.1, 0.55, p))
+          : lerp(5.5, 11.8, smoothstep(0.55, 0.85, p));
+      const pitch   = lerp(12, 52, smoothstep(0.2, 0.78, p));
+      const bearing = lerp(0, -15, smoothstep(0.7, 0.98, p));
+      const centerLng = lerp(-3.0, -3.0112, smoothstep(0.4, 0.78, p));
+      const centerLat = lerp(13.5, 11.4503, smoothstep(0.4, 0.78, p));
 
-    map.jumpTo({ zoom, pitch, bearing, center: [centerLng, centerLat] });
+      map.jumpTo({ zoom, pitch, bearing, center: [centerLng, centerLat] });
 
-    // Burkina activation (0.30 → 0.55)
-    const bfOpacity = smoothstep(0.3, 0.55, p);
-    try {
-      map.setPaintProperty("bf-fill", "fill-opacity", bfOpacity * 0.20);
-      map.setPaintProperty("bf-border", "line-opacity", bfOpacity);
-      map.setPaintProperty("bf-border-glow", "line-opacity", bfOpacity * 0.55);
-    } catch {}
+      // ─── Burkina territory activation (0.30 → 0.55) ──────────────────
+      const bfOpacity = smoothstep(0.3, 0.55, p);
+      try {
+        map.setPaintProperty("bf-fill",        "fill-opacity", bfOpacity * 0.25);
+        map.setPaintProperty("bf-border",      "line-opacity", bfOpacity);
+        map.setPaintProperty("bf-border-glow", "line-opacity", bfOpacity * 0.55);
+      } catch {}
 
-    // Vein reveal (0.55 → 0.80)
-    const veinRaw = smoothstep(0.55, 0.8, p);
-    const veinCut = Math.max(0.001, Math.min(0.999, veinRaw));
-    try {
-      map.setPaintProperty("vein-bloom", "line-opacity", veinRaw * 0.4);
-      map.setPaintProperty("vein-body", "line-opacity", veinRaw > 0 ? 1 : 0);
-      map.setPaintProperty("vein-core", "line-opacity", veinRaw > 0 ? 0.95 : 0);
+      // ─── Birimian Belt reveal (0.20 → 0.55) ──────────────────────────
+      const beltRaw = smoothstep(0.20, 0.55, p);
+      const beltCut = Math.max(0.001, Math.min(0.999, beltRaw));
+      try {
+        map.setPaintProperty("belt-zone",  "line-opacity", beltRaw * 0.12);
+        map.setPaintProperty("belt-bloom", "line-opacity", beltRaw * 0.35);
+        map.setPaintProperty("belt-body",  "line-opacity", beltRaw > 0 ? 0.9 : 0);
+        map.setPaintProperty("belt-core",  "line-opacity", beltRaw > 0 ? 0.95 : 0);
 
-      if (veinRaw > 0) {
-        const tail = Math.min(0.9999, veinCut + 0.001);
-        map.setPaintProperty("vein-body", "line-gradient", [
-          "interpolate", ["linear"], ["line-progress"],
-          0, "#B8954A",
-          veinCut, "#D4AF5A",
-          tail, "rgba(184,149,74,0)",
-          1, "rgba(184,149,74,0)",
-        ]);
-        map.setPaintProperty("vein-core", "line-gradient", [
-          "interpolate", ["linear"], ["line-progress"],
-          0, "#F5E0A0",
-          veinCut, "#F5E0A0",
-          tail, "rgba(245,224,160,0)",
-          1, "rgba(245,224,160,0)",
-        ]);
-      }
-    } catch {}
+        if (beltRaw > 0) {
+          const tail = Math.min(0.9999, beltCut + 0.001);
+          map.setPaintProperty("belt-body", "line-gradient", [
+            "interpolate", ["linear"], ["line-progress"],
+            0,        "#B8954A",
+            beltCut,  "#D4AF5A",
+            tail,     "rgba(184,149,74,0)",
+            1,        "rgba(184,149,74,0)",
+          ]);
+          map.setPaintProperty("belt-core", "line-gradient", [
+            "interpolate", ["linear"], ["line-progress"],
+            0,        "#F5E0A0",
+            beltCut,  "#F5E0A0",
+            tail,     "rgba(245,224,160,0)",
+            1,        "rgba(245,224,160,0)",
+          ]);
+        }
+      } catch {}
 
-    // Target markers (0.80 → 0.95)
-    const targetsOpacity = smoothstep(0.8, 0.95, p);
-    markersRef.current.forEach((m) => {
-      const el = m.getElement();
-      if (el.classList.contains("sovereign-target")) {
-        el.style.opacity = String(targetsOpacity);
-      }
+      // ─── Target markers (0.80 → 0.95) ────────────────────────────────
+      const targetsOpacity = smoothstep(0.8, 0.95, p);
+      markersRef.current.forEach((m) => {
+        const el = m.getElement();
+        if (el.classList.contains("sovereign-target")) {
+          el.style.opacity = String(targetsOpacity);
+        }
+      });
     });
   });
 
