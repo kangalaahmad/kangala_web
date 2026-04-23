@@ -193,9 +193,9 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           });
         }
 
-        // ── 2. Deepen water tone (land stays default for contrast) ──
+        // ── 2. Water = Sovereign #0A192F — seamless with UI background ──
         try {
-          map.setPaintProperty("water", "fill-color", "#03080F");
+          map.setPaintProperty("water", "fill-color", "#0A192F");
         } catch {}
 
         // ── 3. 3D terrain ──
@@ -271,7 +271,7 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
             "line-color": "#D4AF5A",
-            "line-width": 2.2,
+            "line-width": 3.0,
             "line-opacity": 0,
           },
         });
@@ -298,8 +298,8 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
             "line-color": "#D4AF5A",
-            "line-width": 18,
-            "line-blur": 10,
+            "line-width": 32,
+            "line-blur": 14,
             "line-opacity": 0,
           },
         });
@@ -311,7 +311,7 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
           source: "gold-vein",
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
-            "line-width": 3.5,
+            "line-width": 5.5,
             "line-opacity": 0,
             "line-gradient": [
               "interpolate",
@@ -443,7 +443,7 @@ export default function SovereignMap({ scrollProgress }: SovereignMapProps) {
     // Burkina activation (0.30 → 0.55)
     const bfOpacity = smoothstep(0.3, 0.55, p);
     try {
-      map.setPaintProperty("bf-fill", "fill-opacity", bfOpacity * 0.12);
+      map.setPaintProperty("bf-fill", "fill-opacity", bfOpacity * 0.20);
       map.setPaintProperty("bf-border", "line-opacity", bfOpacity);
       map.setPaintProperty("bf-border-glow", "line-opacity", bfOpacity * 0.55);
     } catch {}

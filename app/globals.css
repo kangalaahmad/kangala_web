@@ -173,9 +173,9 @@ html { font-display: swap; }
   flex-direction: column;
   gap: 2px;
   padding: 4px 8px;
-  background: rgba(10, 25, 47, 0.7);
-  border: 1px solid rgba(184, 149, 74, 0.3);
-  backdrop-filter: blur(4px);
+  background: rgba(10, 25, 47, 0.88);
+  border: 1px solid rgba(184, 149, 74, 0.5);
+  backdrop-filter: blur(6px);
 }
 
 .sovereign-target__id {
@@ -216,7 +216,7 @@ html { font-display: swap; }
 /* ─── Country label overlays (Cinzel typography, tracks map pan/zoom) ─── */
 .sovereign-country-label {
   font-family: var(--font-cinzel), serif;
-  color: rgba(218, 211, 198, 0.55);
+  color: rgba(218, 211, 198, 0.70);
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(10,25,47,0.8);
   white-space: nowrap;
@@ -232,7 +232,7 @@ html { font-display: swap; }
   letter-spacing: 0.55em;
   color: #D4AF5A;
   font-weight: 400;
-  text-shadow: 0 0 12px rgba(212,175,90,0.35), 0 1px 2px rgba(10,25,47,0.8);
+  text-shadow: 0 0 16px rgba(212,175,90,0.55), 0 0 32px rgba(212,175,90,0.25), 0 1px 2px rgba(10,25,47,0.9);
 }
 .sovereign-country-label--sovereign {
   position: relative;
