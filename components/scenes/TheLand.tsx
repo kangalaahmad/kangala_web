@@ -77,21 +77,41 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
 
   return (
     <section ref={ref} className="relative h-[400vh] w-full bg-sovereign">
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
-        {/* Atmospheric gradient */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at 55% 55%, rgba(184,149,74,0.08) 0%, transparent 65%)",
-          }}
-        />
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+
+        {/* ── MAP — full-screen background on ALL breakpoints ── */}
+        <motion.div style={{ opacity: mapOpacity }} className="absolute inset-0">
+          {/* Mobile vignette: darken top + bottom so text is readable */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none z-10 md:hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,25,47,0.78) 0%, rgba(10,25,47,0.15) 45%, rgba(10,25,47,0.65) 100%)",
+            }}
+          />
+          {/* Desktop vignette: dark band on the left (behind text), clear on right */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none z-10 hidden md:block"
+            style={{
+              background:
+                "linear-gradient(to right, rgba(10,25,47,0.92) 0%, rgba(10,25,47,0.60) 36%, rgba(10,25,47,0.08) 54%, rgba(10,25,47,0.50) 82%, rgba(10,25,47,0.80) 100%)",
+            }}
+          />
+          {/* Corner accent frames */}
+          <div className="hidden md:block absolute top-[6%] right-[4%] w-8 h-8 border-t border-r border-gold/40 z-20 pointer-events-none" />
+          <div className="hidden md:block absolute bottom-[6%] right-[4%] w-8 h-8 border-b border-r border-gold/40 z-20 pointer-events-none" />
+          <div className="hidden md:block absolute top-[6%] left-[42%] w-8 h-8 border-t border-l border-gold/40 z-20 pointer-events-none" />
+          <div className="hidden md:block absolute bottom-[6%] left-[42%] w-8 h-8 border-b border-l border-gold/40 z-20 pointer-events-none" />
+
+          <SovereignMap scrollProgress={scrollYProgress} />
+        </motion.div>
 
         {/* Faint cartographic grid */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none opacity-[0.022]"
+          className="absolute inset-0 pointer-events-none opacity-[0.018] z-[11]"
           style={{
             backgroundImage:
               "linear-gradient(rgba(184,149,74,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(184,149,74,0.6) 1px, transparent 1px)",
@@ -99,78 +119,62 @@ export default function TheLand({ lang = "en" }: SceneProps = {}) {
           }}
         />
 
-        <div className="relative z-10 container mx-auto px-6 md:px-12 max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-[40%_60%] gap-8 md:gap-10 lg:gap-14 items-center">
-            {/* ═══ TEXT COLUMN ═══
-                Source order 1 → right side in RTL desktop, top on mobile. */}
+        {/* ── TEXT PANEL — overlay on mobile, left-column on desktop ── */}
+        <div className="relative z-20 h-full flex flex-col justify-center">
+          <div className="container mx-auto px-6 md:px-12 max-w-7xl">
             <motion.div
               style={{ opacity: textOpacity, y: textY }}
-              className="relative"
+              className={[
+                "relative w-full md:w-[44%]",
+                /* mobile: frosted card so text is legible over map */
+                "bg-sovereign/75 md:bg-transparent",
+                "backdrop-blur-sm md:backdrop-blur-none",
+                "border border-gold/15 md:border-0",
+                "rounded-sm md:rounded-none",
+                "px-5 py-6 md:p-0",
+              ].join(" ")}
             >
-              <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-6 opacity-80">
+              <div className="font-cinzel text-gold tracking-[0.6em] text-[10px] md:text-xs mb-4 md:mb-6 opacity-80">
                 {t.supra}
               </div>
 
-              <h2 className="font-cinzel display-lg font-light text-ivory leading-[1.15] tracking-tight">
+              <h2 className="font-cinzel text-3xl md:text-5xl lg:text-6xl font-light text-ivory leading-[1.15] tracking-tight">
                 {t.headlineA}
                 <br />
                 <span className="text-gold-gradient font-normal">{t.headlineB}</span>
               </h2>
 
-              <div className="mt-8 mb-8 flex items-center gap-4 text-gold/50">
-                <div className="w-20 h-px bg-gold/40" />
+              <div className="mt-5 mb-5 md:mt-8 md:mb-8 flex items-center gap-4 text-gold/50">
+                <div className="w-16 md:w-20 h-px bg-gold/40" />
                 <span className="text-xs">◆</span>
-                <div className="w-8 h-px bg-gold/20" />
+                <div className="w-6 md:w-8 h-px bg-gold/20" />
               </div>
 
-              <p className="font-inter text-ivory/70 text-base md:text-lg leading-relaxed max-w-xl">
+              <p className="font-inter text-ivory/75 text-sm md:text-base lg:text-lg leading-relaxed max-w-xl">
                 {t.body}
               </p>
 
-              <div className="mt-12 inline-block relative">
-                {/* Corner frames */}
+              <div className="mt-6 md:mt-12 inline-block relative">
                 <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-gold/60" />
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-gold/60" />
-                <div className="border border-gold/20 bg-sovereign-deep/30 px-7 py-5 backdrop-blur-sm">
-                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[11px] uppercase mb-2">
+                <div className="border border-gold/20 bg-sovereign-deep/40 px-5 py-4 md:px-7 md:py-5">
+                  <div className="font-cinzel text-gold/60 tracking-[0.3em] text-[10px] md:text-[11px] uppercase mb-2">
                     {t.concessionLabel}
                   </div>
-                  <div className="font-cinzel text-ivory text-xl md:text-2xl font-light tabular-nums">
-                    <span className="text-gold/70 text-[11px] tracking-[0.3em] uppercase block mb-1">{t.areaLabel}</span>
+                  <div className="font-cinzel text-ivory text-lg md:text-2xl font-light tabular-nums">
+                    <span className="text-gold/70 text-[10px] md:text-[11px] tracking-[0.3em] uppercase block mb-1">
+                      {t.areaLabel}
+                    </span>
                     40 km²
                   </div>
                 </div>
               </div>
             </motion.div>
-
-            {/* ═══ MAP COLUMN ═══
-                Real 3D Mapbox cartography with scroll-driven camera */}
-            <motion.div
-              style={{ opacity: mapOpacity }}
-              className="relative w-full aspect-[16/11]"
-            >
-              {/* Soft atmospheric vignette — map fades into sovereign bg */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none z-10"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(10,25,47,0.7) 90%, rgba(10,25,47,1) 100%)",
-                }}
-              />
-              {/* Corner accent frames — luxury cartographic ornament */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-gold/40 z-20 pointer-events-none" />
-              <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-gold/40 z-20 pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-gold/40 z-20 pointer-events-none" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-gold/40 z-20 pointer-events-none" />
-
-              <SovereignMap scrollProgress={scrollYProgress} />
-            </motion.div>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[11px] tracking-[0.5em] pointer-events-none">
+        <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 font-cinzel text-gold/30 text-[11px] tracking-[0.5em] pointer-events-none">
           {t.scrollReveal}
         </div>
       </div>
