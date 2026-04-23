@@ -651,132 +651,221 @@ function ClimaticOrbit({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Mobile: The Neural Pipeline
+// Mobile: Magnetic Snap Carousel
+// Each company is a full-viewport slide — scroll-snap-stop: always
+// forces the user to stop at every card (magnetic behaviour).
 // ═══════════════════════════════════════════════════════════════════
 
 // Per-logo scale — zooms SVG artwork to fill capsule, clipped by overflow:hidden
-// Tune these values per logo until artwork fills the capsule edge-to-edge
 const LOGO_SCALE = [1.7, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.6] as const;
-// 01:Nakala 02:KglTransport 03:KglOr 04:Naigaiba 05:Emirates 06:AirCargo 07:Carrière 08:KglIndustries
-// logos 02-04,06-07 have tight viewBox set directly in their SVG files — no CSS scale needed
 
-function MobilePipeline({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
-  const [activeIdx, setActiveIdx] = useState(-1);
-  const nodeRefs = useRef<Array<HTMLDivElement | null>>(Array(items.length).fill(null));
-
-  // Free-scroll IntersectionObserver: whichever node enters the viewport
-  // centre zone becomes active. No scroll hijacking, full user agency.
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    nodeRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveIdx(i);
-        },
-        { threshold: 0.5, rootMargin: "-25% 0px -25% 0px" }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, [items.length]);
-
+// ── Pill navigation dots ──────────────────────────────────────────
+function MobileNavDots({
+  total,
+  active,
+  onDot,
+}: {
+  total: number;
+  active: number;
+  onDot: (i: number) => void;
+}) {
   return (
-    <section className="relative w-full bg-[#061022] py-16 overflow-hidden">
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-[6px] z-10">
+      {Array.from({ length: total }).map((_, i) => (
+        <button
+          key={i}
+          aria-label={`Go to slide ${i + 1}`}
+          onClick={() => onDot(i)}
+          style={{
+            width: i === active ? 20 : 6,
+            height: 6,
+            borderRadius: 3,
+            background: i === active ? "#D4AF5A" : "rgba(212,175,90,0.25)",
+            transition: "width 0.35s ease, background 0.35s ease",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Hub intro slide ───────────────────────────────────────────────
+function MobileHubSlide({
+  items,
+  t,
+  active,
+  total,
+  onDot,
+}: {
+  items: Subsidiary[];
+  t: UiLabels;
+  active: number;
+  total: number;
+  onDot: (i: number) => void;
+}) {
+  return (
+    <div className="relative h-full flex flex-col items-center justify-center px-6 text-center">
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 12%, rgba(212,175,90,0.07) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 50% 40%, rgba(212,175,90,0.1) 0%, transparent 65%)",
         }}
       />
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+      {/* Hub logo capsule */}
+      <motion.div
+        className="relative overflow-hidden mb-8"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(212,175,90,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,90,0.6) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-      <div className="relative z-10 max-w-lg mx-auto px-5">
-        <div className="text-center mb-10">
-          <div className="font-cinzel text-[#D4AF5A] tracking-[0.4em] text-[10px] opacity-80 mb-3">
-            {t.supra}
-          </div>
-          <h2 className="font-cinzel text-[#DAD3C6] tracking-[0.1em] text-2xl md:text-3xl font-light">
-            {t.titleA}{" "}
-            <span
-              style={{
-                background:
-                  "linear-gradient(135deg, #F5E0A0 0%, #D4AF5A 50%, #B8954A 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {t.titleB}
-            </span>
-          </h2>
-          <div className="mt-2 font-cinzel text-[#DAD3C6]/40 tracking-[0.25em] text-[11px] uppercase">
-            {t.subStats}
-          </div>
-        </div>
-        <div className="relative">
-          <MobileHub items={items} t={t} />
-          {items.map((s, i) => (
-            <MobileNode
-              key={s.num}
-              s={s}
-              index={i}
-              t={t}
-              isActive={activeIdx === i}
-              setNodeRef={(el) => { nodeRefs.current[i] = el; }}
-            />
-          ))}
-        </div>
-        <div style={{ marginLeft: "calc(-50vw + 50%)", width: "100vw", overflow: "hidden" }}>
-          <MobileGalaxy items={items} t={t} />
-        </div>
-        <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-3 text-[#D4AF5A]/50 font-cinzel tracking-[0.3em] text-[10px] uppercase">
-            <span className="w-8 h-px bg-[#D4AF5A]/30" />
-            {t.footerLine}
-            <span className="w-8 h-px bg-[#D4AF5A]/30" />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MobileHub({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
-  return (
-    <motion.div
-      className="relative mb-4"
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, ease: CINEMATIC }}
-    >
-      <div
-        className="relative overflow-hidden"
-        style={{
-          height: 88,
-          borderRadius: 44,
+          width: 168,
+          height: 100,
+          borderRadius: 50,
           background: "radial-gradient(circle at 38% 32%, #FDFAF5 0%, #EDE5D4 100%)",
           border: "2px solid rgba(212,175,90,0.9)",
           boxShadow:
-            "0 0 0 5px rgba(212,175,90,0.1), 0 0 40px rgba(212,175,90,0.4), 0 0 80px rgba(212,175,90,0.15)",
-          zIndex: 2,
+            "0 0 0 5px rgba(212,175,90,0.1), 0 0 44px rgba(212,175,90,0.45), 0 0 88px rgba(212,175,90,0.14)",
         }}
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: CINEMATIC }}
       >
-        <div className="absolute" style={{ inset: 6 }}>
+        <div className="absolute inset-4">
           <div className="relative w-full h-full">
             <Image
               src="/logos/kangala_holding_gold.svg"
-              alt="Kangala"
+              alt="Kangala Holding"
+              fill
+              sizes="168px"
+              className="object-contain"
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.7 }}
+        className="w-full"
+      >
+        <div className="font-cinzel text-[#D4AF5A]/60 tracking-[0.45em] text-[10px] mb-3">
+          {t.supra}
+        </div>
+        <h2 className="font-cinzel text-[#DAD3C6] text-2xl font-light tracking-wide">
+          {t.titleA}{" "}
+          <span
+            style={{
+              background: "linear-gradient(135deg, #F5E0A0 0%, #D4AF5A 50%, #B8954A 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            {t.titleB}
+          </span>
+        </h2>
+
+        {/* Stats row */}
+        <div className="mt-8 flex justify-center gap-10">
+          {[
+            { n: "14", label: t.defaultSubsidiariesLabel },
+            { n: "8",  label: t.defaultBackboneLabel },
+            { n: "3",  label: t.defaultCountriesLabel },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="font-cinzel text-3xl" style={{ color: "#D4AF5A" }}>
+                {stat.n}
+              </div>
+              <div className="font-cinzel text-[#DAD3C6]/40 text-[9px] tracking-[0.25em] uppercase mt-1">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Swipe hint */}
+      <div className="absolute bottom-20 flex flex-col items-center gap-2 pointer-events-none">
+        <span className="font-cinzel text-[#D4AF5A]/30 text-[9px] tracking-[0.5em] uppercase">
+          Swipe to Explore
+        </span>
+        <div className="w-px h-6 bg-gradient-to-b from-[#D4AF5A]/30 to-transparent" />
+      </div>
+
+      <MobileNavDots total={total} active={active} onDot={onDot} />
+    </div>
+  );
+}
+
+// ── Single company slide ──────────────────────────────────────────
+function MobileCompanySlide({
+  s,
+  index,
+  active,
+  total,
+  onDot,
+}: {
+  s: Subsidiary;
+  index: number;
+  active: number;
+  total: number;
+  onDot: (i: number) => void;
+}) {
+  const logoScale = LOGO_SCALE[index] ?? 1;
+  return (
+    <div className="relative h-full flex flex-col px-5 pt-12 pb-24">
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 30%, rgba(212,175,90,0.07) 0%, transparent 60%)",
+        }}
+      />
+
+      {/* Counter + country badge */}
+      <div className="relative flex items-center justify-between mb-5">
+        <span className="font-cinzel text-[#D4AF5A]/35 text-[10px] tracking-[0.4em]">
+          {String(index + 1).padStart(2, "0")} / {String(total - 1).padStart(2, "0")}
+        </span>
+        <span
+          className="font-cinzel text-[#D4AF5A]/70 text-[9px] tracking-[0.2em] uppercase px-2.5 py-[3px]"
+          style={{
+            border: "1px solid rgba(212,175,90,0.28)",
+            background: "rgba(212,175,90,0.06)",
+          }}
+        >
+          {s.country}
+        </span>
+      </div>
+
+      {/* Logo capsule */}
+      <div
+        className="relative overflow-hidden mb-5"
+        style={{
+          height: 92,
+          borderRadius: 46,
+          background: "radial-gradient(circle at 38% 32%, #FDFAF5 0%, #EDE5D4 100%)",
+          border: "2px solid rgba(212,175,90,0.85)",
+          boxShadow:
+            "0 0 0 4px rgba(212,175,90,0.1), 0 0 38px rgba(212,175,90,0.55), 0 0 72px rgba(212,175,90,0.14)",
+        }}
+      >
+        <div
+          className="absolute"
+          style={{
+            inset: 4,
+            transform: `scale(${logoScale})`,
+            transformOrigin: "center center",
+          }}
+        >
+          <div className="relative w-full h-full">
+            <Image
+              src={s.logo}
+              alt={s.name}
               fill
               sizes="(max-width: 512px) 100vw, 512px"
               className="object-contain"
@@ -784,189 +873,133 @@ function MobileHub({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
           </div>
         </div>
       </div>
-      <div className="mt-2.5 pl-1">
-        <div className="font-cinzel text-[#D4AF5A]/55 tracking-[0.35em] text-[10px] uppercase mb-0.5">
-          {t.readoutPanel}
-        </div>
-        <div className="font-cinzel text-[#DAD3C6] text-[13px] tracking-[0.08em] font-light">
-          Kangala Holding
-        </div>
-        <div className="font-inter text-[#DAD3C6]/40 text-[10px] mt-0.5">
-          {items.length} subsidiaries · 3 countries
-        </div>
+
+      {/* Category */}
+      <div className="relative font-cinzel text-[#D4AF5A]/55 tracking-[0.28em] text-[10px] uppercase mb-2">
+        {s.category}
       </div>
-    </motion.div>
+
+      {/* Name */}
+      <h3 className="relative font-cinzel text-[#DAD3C6] text-xl font-light leading-snug mb-3 tracking-wide">
+        {s.name}
+      </h3>
+
+      {/* Description */}
+      <p className="relative font-inter text-[#DAD3C6]/55 text-sm leading-relaxed flex-1">
+        {s.desc}
+      </p>
+
+      {/* Stats bar */}
+      <div
+        className="relative flex items-center justify-between pt-4 mt-4"
+        style={{ borderTop: "1px solid rgba(212,175,90,0.12)" }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="relative w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#D4AF5A" }}>
+            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "rgba(212,175,90,0.5)" }} />
+          </span>
+          <span className="font-cinzel text-[#D4AF5A] tracking-[0.18em] text-[11px]">
+            {s.highlight}
+          </span>
+        </div>
+        <span className="font-inter text-[#DAD3C6]/40 text-[10px]">{s.location}</span>
+      </div>
+
+      <MobileNavDots total={total} active={active} onDot={onDot} />
+    </div>
   );
 }
 
-function MobileNode({
-  s,
-  index,
-  t,
-  isActive,
-  setNodeRef,
-}: {
-  s: Subsidiary;
-  index: number;
-  t: UiLabels;
-  isActive: boolean;
-  setNodeRef: (el: HTMLDivElement | null) => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
+// ── Main carousel shell ───────────────────────────────────────────
+function MobilePipeline({ items, t }: { items: Subsidiary[]; t: UiLabels }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<Array<HTMLDivElement | null>>(
+    Array(items.length + 1).fill(null)
+  );
+  const [activeSlide, setActiveSlide] = useState(0);
+  const TOTAL = items.length + 1;
 
   useEffect(() => {
-    setNodeRef(ref.current);
-    return () => setNodeRef(null);
-  }, [setNodeRef]);
+    const container = scrollRef.current;
+    if (!container) return;
+    const observers: IntersectionObserver[] = [];
+    slideRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSlide(i); },
+        { root: container, threshold: 0.6 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, [items.length]);
+
+  const goToSlide = (i: number) => {
+    const el = slideRefs.current[i];
+    if (el && scrollRef.current) {
+      scrollRef.current.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+    }
+  };
 
   return (
-    <motion.div
-      ref={ref}
-      className="relative mb-3"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.5, delay: index * 0.03 }}
-    >
-      {/* Capsule container — collapses to 40px when inactive, no dead space */}
+    <section className="relative bg-[#061022]" style={{ height: "100svh" }}>
+      {/* Cartographic grid */}
       <div
-        className="relative transition-[height] duration-500"
-        style={{ height: isActive ? 96 : 40 }}
+        aria-hidden
+        className="absolute inset-0 pointer-events-none opacity-[0.025] z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(212,175,90,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,90,0.6) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* Snap scroll container */}
+      <div
+        ref={scrollRef}
+        className="relative z-10"
+        style={{
+          height: "100svh",
+          overflowY: "scroll",
+          scrollSnapType: "y mandatory",
+          overscrollBehavior: "contain",
+        }}
       >
-        <motion.div
-          className="absolute overflow-hidden"
-          style={{
-            left: 0,
-            zIndex: 2,
-            background: "radial-gradient(circle at 38% 32%, #FDFAF5 0%, #EDE5D4 100%)",
-          }}
-          animate={{
-            width: isActive ? "100%" : 24,
-            height: isActive ? 88 : 24,
-            top: isActive ? 4 : 8,
-            borderRadius: isActive ? 44 : 12,
-            boxShadow: isActive
-              ? "0 0 0 4px rgba(212,175,90,0.12), 0 0 40px rgba(212,175,90,0.7), 0 0 80px rgba(212,175,90,0.18)"
-              : "0 0 0 1px rgba(212,175,90,0.15), 0 2px 8px rgba(0,0,0,0.35)",
-          }}
-          transition={{
-            width: { duration: 0.65, ease: EASE.SNAP },
-            height: { duration: 0.55, ease: EASE.SNAP },
-            top: { duration: 0.55, ease: EASE.SNAP },
-            borderRadius: { duration: 0.65, ease: EASE.SNAP },
-            boxShadow: { duration: 0.4 },
-          }}
+        {/* Slide 0 — Hub intro */}
+        <div
+          ref={(el) => { slideRefs.current[0] = el; }}
+          style={{ height: "100svh", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+          className="relative"
         >
-          {/* Gold border overlay */}
-          <motion.div
-            className="absolute inset-0 rounded-[inherit] pointer-events-none"
-            style={{ zIndex: 3 }}
-            animate={{
-              boxShadow: isActive
-                ? "inset 0 0 0 1.5px rgba(212,175,90,0.75)"
-                : "inset 0 0 0 1px rgba(212,175,90,0.25)",
-            }}
-            transition={{ duration: 0.4 }}
+          <MobileHubSlide
+            items={items}
+            t={t}
+            active={activeSlide}
+            total={TOTAL}
+            onDot={goToSlide}
           />
-          {/* Capsule content — logo only, full inset */}
-          <motion.div
-            className="absolute inset-0"
-            animate={{ opacity: isActive ? 1 : 0 }}
-            transition={{ duration: 0.3, delay: isActive ? 0.28 : 0 }}
+        </div>
+
+        {/* Slides 1‥N — one per subsidiary */}
+        {items.map((s, i) => (
+          <div
+            key={s.num}
+            ref={(el) => { slideRefs.current[i + 1] = el; }}
+            style={{ height: "100svh", scrollSnapAlign: "start", scrollSnapStop: "always" }}
+            className="relative"
           >
-            <div
-              className="absolute"
-              style={{
-                inset: 2,
-                transform: `scale(${LOGO_SCALE[index] ?? 1})`,
-                transformOrigin: "center center",
-              }}
-            >
-              <div className="relative w-full h-full">
-                <Image
-                  src={s.logo}
-                  alt={s.name}
-                  fill
-                  sizes="(max-width: 512px) 100vw, 512px"
-                  className="object-contain"
-                />
-              </div>
-            </div>
-          </motion.div>
-          {/* Inactive dot */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            animate={{ opacity: isActive ? 0 : 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div
-              className="rounded-full"
-              style={{ width: 8, height: 8, background: "rgba(212,175,90,0.55)" }}
+            <MobileCompanySlide
+              s={s}
+              index={i}
+              active={activeSlide}
+              total={TOTAL}
+              onDot={goToSlide}
             />
-          </motion.div>
-        </motion.div>
+          </div>
+        ))}
       </div>
-      {/* HUD Card — category+country in header row, slides in below */}
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            key={s.num + "-card"}
-            initial={{ opacity: 0, y: -8, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: "auto" }}
-            exit={{ opacity: 0, y: -8, height: 0 }}
-            transition={{ duration: 0.45, delay: 0.32, ease: EASE.SPRING }}
-            className="overflow-hidden"
-          >
-            <div
-              className="relative mt-1.5 p-4"
-              style={{
-                background: "rgba(6,16,34,0.62)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(212,175,90,0.2)",
-                boxShadow: "0 0 0 1px rgba(10,25,47,0.4), 0 6px 32px rgba(0,0,0,0.45)",
-              }}
-            >
-              <span className="absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-[#D4AF5A]/40" />
-              <span className="absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-[#D4AF5A]/40" />
-              <span className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-[#D4AF5A]/40" />
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-[#D4AF5A]/40" />
-              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-[#D4AF5A]/10">
-                <span className="font-cinzel text-[#D4AF5A]/60 tracking-[0.22em] text-[10px] uppercase">
-                  {s.category}
-                </span>
-                <span
-                  className="font-cinzel text-[#D4AF5A] text-[10px] px-1.5 py-[1px]"
-                  style={{
-                    border: "1px solid rgba(212,175,90,0.35)",
-                    background: "rgba(212,175,90,0.08)",
-                  }}
-                >
-                  {s.country}
-                </span>
-              </div>
-              <h3 className="font-cinzel text-[#DAD3C6] text-sm font-light leading-snug mb-2 tracking-wide">
-                {s.name}
-              </h3>
-              <p className="font-inter text-[#DAD3C6]/55 text-[11px] leading-relaxed mb-3">
-                {s.desc}
-              </p>
-              <div className="flex items-center justify-between pt-2 border-t border-[#D4AF5A]/10 flex-wrap gap-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="relative w-1 h-1 rounded-full bg-[#D4AF5A]">
-                    <span className="absolute inset-0 rounded-full bg-[#D4AF5A]/50 animate-ping" />
-                  </span>
-                  <span className="font-cinzel text-[#D4AF5A] tracking-[0.18em] text-[10px]">
-                    {s.highlight}
-                  </span>
-                </div>
-                <span className="font-inter text-[#DAD3C6]/40 text-[10px]">{s.location}</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+    </section>
   );
 }
 
